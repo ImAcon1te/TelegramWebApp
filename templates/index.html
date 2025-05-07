@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Пример Telegram Web App</title>
+  <!-- Подключаем Telegram Web App API -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      color: #0088cc;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="messageText">Захар пидор</h1>
+  <button id="sendDataButton">Отправить костяну пиво</button>
+
+  <script>
+    // Инициализация Telegram Web App
+    const tg = window.Telegram.WebApp;
+    console.log("Init Data:", tg.initData);
+
+    document.getElementById("sendDataButton").addEventListener("click", function() {
+      // Меняем текст заголовка
+      document.getElementById("messageText").innerText = "ирл хочу";
+
+      // Подготавливаем данные для отправки на сервер
+      const data = {
+          message: "Button pressed",
+          user_id: tg.initDataUnsafe.user.id  // используем user.id из данных инициализации
+      };
+
+      // Отправляем данные на сервер через fetch
+      fetch('/send_data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log('Ответ от сервера:', data);
+          // Показываем сообщение от бота пользователю
+          alert(data.bot_message);
+      })
+      .catch(error => console.error('Ошибка:', error));
+    });
+  </script>
+</body>
+</html>

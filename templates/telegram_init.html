@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Telegram Web App init{% endblock %}
+
+{% block content %}
+iniціалізація телеграм. Будь ласка, зачекайте
+<script>
+  const tg = window.Telegram.WebApp;
+  console.log("Init Data:", tg.initData);
+
+  const data = {
+      user: tg.initDataUnsafe.user
+  };
+
+  fetch('/init_telegram', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(result => {
+      if(result.redirect) {
+          window.location.href = result.redirect;
+      } else {
+          console.error('Init error');
+      }
+  })
+  .catch(error => console.error('Error:', error));
+</script>
+{% endblock %}

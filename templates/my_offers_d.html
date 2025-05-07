@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% block title %}Мої пропозиції{% endblock %}
+{% block content %}
+
+<div class="top-nav">
+  <a href="{{ url_for('incoming_notifications') }}" class="filter-button"><img src="../static/images/notification_button.png"></a>
+  {% if role == 'purchase_offers' %}
+    <button id="openRolesModal" class="nav-button">Продавець</button>
+  {% elif role == 'sale_offers' %}
+    <button id="openRolesModal" class="nav-button">Покупець</button>
+  {% elif role == 'rental_offers' %}
+    <button id="openRolesModal" class="nav-button">Орендатор</button>
+  {% endif %}
+  <!--<button id="openRolesModal" class="nav-button">Продавець</button>-->
+  <a href="{{ url_for('settings') }}" class="filter-button"><img src="../static/images/profile_button.png"></a>
+</div>
+
+<div class="selections">
+  <a href="{% if role == 'purchase_offers' %}
+            {{ url_for('sale_offers') }}
+            {% elif role == 'sale_offers' %}
+            {{ url_for('purchase_offers') }}
+            {% elif role == 'rental_offers' %}
+            {{ url_for('rental_offers') }}
+            {% endif %}" class="nav-button">Список оголошень</a>
+  <a href="{{ url_for('create_offer') }}" class="nav-button">Створити</a>
+  <p class="current_selection">Мої</p>
+</div>
+
+<div class="offers-list">
+{% if role=='sale_offers' %}
+  {% if sale_offers %}
+    {% for offer in sale_offers %}
+      <div class="offer-card">
+          <div class="offer-left">
+            <img
+              src="{{ url_for('static', filename='images/default-avatar.png') }}"
+              alt="Avatar"
+              class="offer-avatar"
+            >
+            <div class="offer-user-info">
+              <p class="offer-user-name">{{ user.first_name }} {{ user.last_name }}</p>
+              <p class="offer-region">
+                {{ offer.region.oblast }}
+                {% if offer.region.district %} - {{ offer.region.district }}{% endif %}
+              </p>
+            </div>
+          </div>
+          <div class="offer-center">
+            <p class="offer-title">Продам: {{ offer.commodity_type }}</p>
+            <p class="offer-tonnage">Тонаж: {{ offer.tonnage }}</p>
+          </div>
+
+          <!-- Правая часть: фон, кнопка "+" и цена -->
+            <div class="offer-right">
+              <p class="offer-price" >
+                {{ offer.price_per_ton }} <span class="offer-currency">грн/т</span>
+              </p>
+            </div>
+
+          <button class="edit-offer-btn" data-offer-id="{{ offer.id }}" data-offer-type="sale">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="icon-edit" viewBox="0 0 16 16">
+              <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-9.439 9.44a.5.5 0 0 1-.168.11l-4 1.5a.5.5 0 0 1-.65-.65l1.5-4a.5.5 0 0 1 .11-.168l9.44-9.439zM11.207 2L3 10.207V12h1.793L14 3.793 11.207 2z"/>
+            </svg>
+          </button>
+          <button class="delete-offer-btn" data-offer-id="{{ offer.id }}" data-offer-type="sale">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="icon-close" viewBox="0 0 16 16">
+              <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+            </svg>
+          </button>
+
+      </div>
+    {% endfor %}
+  {% else %}
+  <p>Немає заявок на продаж</p>
+  {% endif %}
+{% endif %}
+
+{% if role=='purchase_offers' %}
+  {% if purchase_offers %}
+    {% for offer in purchase_offers %}
+      <div class="offer-card">
+        <!-- Левая часть: аватар, имя, регион -->
+        <div class="offer-left">
+          <img
+            src="{{ url_for('static', filename='images/default-avatar.png') }}"
+            alt="Avatar"
+            class="offer-avatar"
+          >
+          <div class="offer-user-info">
+            <p class="offer-user-name">{{ user.first_name }} {{ user.last_name }}</p>
+            <p class="offer-region">
+              {{ offer.region.oblast }}
+              {% if offer.region.district %} - {{ offer.region.district }}{% endif %}
+            </p>
+          </div>
+        </div>
+        <!-- Центральная часть: описание предложения -->
+        <div class="offer-center">
+          <p class="offer-title">Куплю: {{ offer.commodity_type }}</p>
+          <p class="offer-tonnage">Тонаж: {{ offer.tonnage }}</p>
+          <!-- <p class="offer-additional">
+            {{ offer.additional_info or '—' }}
+          </p> -->
+          <!-- <p class="offer-date">
+            <small>Створено: {{ offer.created_at.strftime("%d.%m.%Y %H:%M") }}</small><br>
+            <small>Оновлено: {{ offer.updated_at.strftime("%d.%m.%Y %H:%M") }}</small>
+          </p> -->
+        </div>
+
+        <!-- Правая часть: фон, кнопка "+" и цена -->
+        <div class="offer-right">
+          <p class="offer-price" >
+            {{ offer.price_per_ton }} <span class="offer-currency">грн/т</span>
+          </p>
+        </div>
+        <button class="delete-offer-btn" data-offer-id="{{ offer.id }}" data-offer-type="purchase">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="icon-close" viewBox="0 0 16 16">
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </button>
+        <button class="edit-offer-btn" data-offer-id="{{ offer.id }}" data-offer-type="purchase">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="icon-edit" viewBox="0 0 16 16">
+            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-9.439 9.44a.5.5 0 0 1-.168.11l-4 1.5a.5.5 0 0 1-.65-.65l1.5-4a.5.5 0 0 1 .11-.168l9.44-9.439zM11.207 2L3 10.207V12h1.793L14 3.793 11.207 2z"/>
+          </svg>
+        </button>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>Немає заявок на закупку</p>
+  {% endif %}
+{% endif %}
+
+{% if role=='rental_offers' %}
+  {% if rental_offers %}
+    {% for offer in rental_offers %}
+      <div class="offer-card">
+        <div class="offer-left">
+        <img
+          src="{{ url_for('static', filename='images/default-avatar.png') }}"
+          alt="Avatar"
+          class="offer-avatar"
+        >
+        <div class="offer-user-info">
+          <p class="offer-user-name">{{ user.first_name }} {{ user.last_name }}</p>
+          <p class="offer-region">
+          </p>
+        </div>
+    </div>
+        <div class="offer-center">
+          <p class="offer-title">Здам: {{ offer.equipment_type }}</p>
+          <p class="offer-tonnage">Строк: {{ offer.time_unit.display() }}</p>
+        </div>
+        <div class="offer-right">
+          <p class="offer-price" >
+            {{ offer.rental_price }} <span class="offer-currency">грн/т</span>
+          </p>
+        </div>
+          <button class="delete-offer-btn" data-offer-id="{{ offer.id }}" data-offer-type="rental">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="icon-close" viewBox="0 0 16 16">
+              <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+            </svg>
+          </button>
+          <button class="edit-offer-btn" data-offer-id="{{ offer.id }}" data-offer-type="rental">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="icon-edit" viewBox="0 0 16 16">
+              <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-9.439 9.44a.5.5 0 0 1-.168.11l-4 1.5a.5.5 0 0 1-.65-.65l1.5-4a.5.5 0 0 1 .11-.168l9.44-9.439zM11.207 2L3 10.207V12h1.793L14 3.793 11.207 2z"/>
+            </svg>
+          </button>
+</div>
+    {% endfor %}
+  {% else %}
+    <p>Немає заявок на оренду</p>
+  {% endif %}
+{% endif %}
+</div>
+
+<div id="deleteModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <p>Ви впевнені, що хочете відкликати заявку? Ця дія видалить заявку та всі пов’язані пропозиції.</p>
+    <div class="modal-buttons">
+      <button id="confirmDelete">Так</button>
+      <button id="cancelDelete">Ні</button>
+    </div>
+  </div>
+</div>
+
+<div id="editModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <span id="closeEditModal" class="modal-close">&times;</span>
+    <h2>Редагувати заявку</h2>
+    <form id="editOfferForm">
+      <!-- Поля формы заполняются динамически в зависимости от типа заявки -->
+      <div id="editFields"></div>
+      <div class="modal-buttons">
+        <button type="button" id="saveEdit" class="common_button_form">Зберегти</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="rolesModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <!-- Кнопка закрытия окна -->
+    <button
+      type="button"
+      id="closeRolesModal"
+      class="modal-close"
+      aria-label="Close"
+    >
+      &times;
+    </button>
+    <h2 class="modal-title">Зміна ролі</h2>
+    <form id="rolesForm">
+      {% if user.is_sale %}
+      <div class="role-item">
+        <label for="role_sale" class="role-label">
+          <input
+            type="radio"
+            id="role_sale"
+            name="role"
+            value="sale"
+          />
+          <span class="role-text">Покупець</span>
+        </label>
+        <div class="role-notification">
+          <i class="fas fa-bell"></i>
+          <span class="notif-badge" id="purchaseAmount">0</span>
+        </div>
+      </div>
+      {% endif %}
+      {% if user.is_purchase %}
+      <div class="role-item">
+        <label for="role_purchase" class="role-label">
+          <input
+            type="radio"
+            id="role_purchase"
+            name="role"
+            value="purchase"
+          />
+          <span class="role-text">Продавець</span>
+        </label>
+        <div class="role-notification">
+          <i class="fas fa-bell"></i>
+          <span class="notif-badge" id="saleAmount">0</span>
+        </div>
+      </div>
+      {% endif %}
+      {% if user.is_rental %}
+      <div class="role-item">
+        <label for="role_rental" class="role-label">
+          <input
+            type="radio"
+            id="role_rental"
+            name="role"
+            value="rental"
+          />
+          <span class="role-text">Орендатор</span>
+        </label>
+        <div class="role-notification">
+          <i class="fas fa-bell"></i>
+          <span class="notif-badge" id="rentalAmount">0</span>
+        </div>
+      </div>
+      {% endif %}
+    </form>
+    <p class="modal-description">Ви можете замінити свою роль</p>
+    <div class="modal-buttons">
+      <button type="button" id="saveRoles" class="modal-btn save-btn ">
+        Зберегти
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='my_offers.js') }}"></script>
+<script src="{{ url_for('static', filename='update_roles.js') }}"></script>
+{% endblock %}

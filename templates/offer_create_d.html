@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block title %}Создать предложение{% endblock %}
+
+{% block content %}
+
+<div class="top-nav">
+  <a href="{{ url_for('incoming_notifications') }}" class="filter-button"><img src="../static/images/notification_button.png"></a>
+  {% if role == 'purchase_offers' %}
+    <button id="openRolesModal" class="nav-button">Продавець</button>
+  {% elif role == 'sale_offers' %}
+    <button id="openRolesModal" class="nav-button">Покупець</button>
+  {% elif role == 'rental_offers' %}
+    <button id="openRolesModal" class="nav-button">Орендатор</button>
+  {% endif %}
+  <a href="#" class="filter-button"><img src="../static/images/profile_button.png"></a>
+</div>
+
+<div class="selections">
+  <a href="{% if role == 'purchase_offers' %}
+            {{ url_for('sale_offers') }}
+            {% elif role == 'sale_offers' %}
+            {{ url_for('purchase_offers') }}
+            {% elif role == 'rental_offers' %}
+            {{ url_for('rental_offers') }}
+            {% endif %}" class="nav-button">Список оголошень</a>
+  <p class="current_selection">Створити</p>
+  <a href="{{ url_for('my_offers') }}" class="nav-button">Мої</a>
+</div>
+
+<div class="offer-create-page">
+  <p>На цій сторінці ви можете створити власне оголошення, яке буде зображено усім користувачам системи</p>
+  <form action="{{ url_for('create_offer') }}" method="POST">
+      <div>
+          <label for="offer_type">Тип оголошення:</label>
+          <select name="offer_type" id="offer_type" required>
+             <!-- <option value="">Оберіть</option>
+              {% if user.is_sale %}
+                <option value="sale">Продаж</option>
+              {% endif %}
+              {% if user.is_purchase %}
+                <option value="purchase">Купівля</option>
+              {% endif %}
+              {% if user.is_rental %}
+                <option value="rental">Оренда</option>
+              {% endif %} -->
+              {% if role == 'purchase_offers' %}
+                <option value="sale">Продаж</option>
+              {% elif role == 'sale_offers' %}
+                <option value="purchase">Купівля</option>
+              {% elif role == 'rental_offers' %}
+                <option value="rental">Оренда</option>
+              {% endif %}
+          </select>
+      </div>
+      {% if role == 'purchase_offers' %}
+      <div id="common_sale_purchase" style="display: block;">
+          <div>
+              <label for="commodity_type">Тип культури/товару:</label>
+              <select name="commodity_type" id="commodity_type" required>
+                  <option value="">Оберіть</option>
+                  <option value="Зерно">Зерно</option>
+                  <option value="Ячмінь">Ячмінь</option>
+                  <option value="Насіння соняшника">Насіння соняшника</option>
+              </select>
+              <!-- <select name="offer_type" id="commodity_type" required>
+                  <option value="">Оберіть</option>
+                  <option value="зерно">Зерно</option>
+                  <option value="рапс">Рапс</option>
+                  <option value="насіння соняшника">Насіння соняшника</option>
+             </select>
+              <input type="text" name="commodity_type" id="commodity_type" required> -->
+          </div>
+          <div>
+              <label for="tonnage">Кількість тон:</label>
+              <input type="number" step="0.01" name="tonnage" id="tonnage" required>
+          </div>
+          <div>
+              <label for="price_per_ton">Сума за 1 тонну:</label>
+              <input type="number" step="0.01" name="price_per_ton" id="price_per_ton" required>
+          </div>
+          <div>
+              <label for="region_id">Регіон:</label>
+              <select name="region_id" id="region_id" required>
+                  <option value="">Оберіть регіон</option>
+                  {% for region in regions %}
+                      <option value="{{ region.id }}">{{ region.oblast }} - {{ region.district }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+      </div>
+      {% elif role == 'sale_offers' %}
+      <div id="common_sale_purchase" style="display: block;">
+          <div>
+              <label for="commodity_type">Тип культури/товару:</label>
+              <select name="commodity_type" id="commodity_type" required>
+                  <option value="">Оберіть</option>
+                  <option value="Зерно">Зерно</option>
+                  <option value="Ячмінь">Ячмінь</option>
+                  <option value="Насіння соняшника">Насіння соняшника</option>
+              </select>
+              <!-- <select name="offer_type" id="commodity_type" required>
+                  <option value="">Оберіть</option>
+                  <option value="зерно">Зерно</option>
+                  <option value="рапс">Рапс</option>
+                  <option value="насіння соняшника">Насіння соняшника</option>
+             </select>
+              <input type="text" name="commodity_type" id="commodity_type" required> -->
+          </div>
+          <div>
+              <label for="tonnage">Кількість тон:</label>
+              <input type="number" step="0.01" name="tonnage" id="tonnage" required>
+          </div>
+          <div>
+              <label for="price_per_ton">Сума за 1 тонну:</label>
+              <input type="number" step="0.01" name="price_per_ton" id="price_per_ton" required>
+          </div>
+          <div>
+              <label for="region_id">Регіон:</label>
+              <select name="region_id" id="region_id" required>
+                  <option value="">Оберіть регіон</option>
+                  {% for region in regions %}
+                      <option value="{{ region.id }}">{{ region.oblast }} - {{ region.district }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+      </div>
+      {% elif role == 'rental_offers' %}
+      <div id="rental_offer" style="display: block;">
+          <div>
+              <label for="equipment_type">Об'єкт оренди:</label>
+              <select name="equipment_type" id="equipment_type" required>
+                  <option value="">Оберіть</option>
+                  <option value="Трактор">Трактор</option>
+                  <option value="Зерновоз">Зерновоз</option>
+                  <option value="Комбайн">Комбайн</option>
+                  <!-- {% for unit in time_units %}
+                      <option value="{{ unit }}">{{ unit }}</option>
+                  {% endfor %} -->
+              </select>
+              <!-- <input type="text" name="equipment_type" id="equipment_type" required> -->
+          </div>
+          <div>
+              <label for="rental_price">Вартість оренди:</label>
+              <input type="number" step="0.01" name="rental_price" id="rental_price" required>
+          </div>
+          <div>
+              <label for="time_unit">Одиниця часу:</label>
+              <select name="time_unit" id="time_unit" required>
+                  <option value="">Оберіть</option>
+                  <option value="hour">година</option>
+                  <option value="day">доба</option>
+                  <option value="month">місяць</option>
+                  <!-- {% for unit in time_units %}
+                      <option value="{{ unit }}">{{ unit }}</option>
+                  {% endfor %} -->
+              </select>
+          </div>
+      </div>
+      {% endif %}
+      <div>
+          <label for="additional_info">Опис оголошення:</label>
+          <textarea name="additional_info" id="additional_info"></textarea>
+      </div>
+
+      <button type="submit" class="common_button_form">Створити оголошення</button>
+  </form>
+</div>
+
+<div id="rolesModal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <!-- Кнопка закрытия окна -->
+    <button
+      type="button"
+      id="closeRolesModal"
+      class="modal-close"
+      aria-label="Close"
+    >
+      &times;
+    </button>
+    <h2 class="modal-title">Зміна ролі</h2>
+    <form id="rolesForm">
+      {% if user.is_sale %}
+      <div class="role-item">
+        <label for="role_sale" class="role-label">
+          <input
+            type="radio"
+            id="role_sale"
+            name="role"
+            value="sale"
+          />
+          <span class="role-text">Покупець</span>
+        </label>
+        <div class="role-notification">
+          <i class="fas fa-bell"></i>
+          <span class="notif-badge" id="purchaseAmount">0</span>
+        </div>
+      </div>
+      {% endif %}
+      {% if user.is_purchase %}
+      <div class="role-item">
+        <label for="role_purchase" class="role-label">
+          <input
+            type="radio"
+            id="role_purchase"
+            name="role"
+            value="purchase"
+          />
+          <span class="role-text">Продавець</span>
+        </label>
+        <div class="role-notification">
+          <i class="fas fa-bell"></i>
+          <span class="notif-badge" id="saleAmount">0</span>
+        </div>
+      </div>
+      {% endif %}
+      {% if user.is_rental %}
+      <div class="role-item">
+        <label for="role_rental" class="role-label">
+          <input
+            type="radio"
+            id="role_rental"
+            name="role"
+            value="rental"
+          />
+          <span class="role-text">Орендатор</span>
+        </label>
+        <div class="role-notification">
+          <i class="fas fa-bell"></i>
+          <span class="notif-badge" id="rentalAmount">0</span>
+        </div>
+      </div>
+      {% endif %}
+    </form>
+    <p class="modal-description">Ви можете замінити свою роль</p>
+    <div class="modal-buttons">
+      <button type="button" id="saveRoles" class="modal-btn save-btn ">
+        Зберегти
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='update_roles.js') }}"></script>
+<script>
+      document.getElementById('offer_type').addEventListener('change', function() {
+          var type = this.value;
+          var commonSection = document.getElementById('common_sale_purchase');
+          var rentalSection = document.getElementById('rental_offer');
+
+          if (type === 'sale' || type === 'purchase') {
+              commonSection.style.display = 'block';
+              rentalSection.style.display = 'none';
+          } else if (type === 'rental') {
+              rentalSection.style.display = 'block';
+              commonSection.style.display = 'none';
+          } else {
+              commonSection.style.display = 'none';
+              rentalSection.style.display = 'none';
+          }
+      });
+  </script>
+{% endblock %}

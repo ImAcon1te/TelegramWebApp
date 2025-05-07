@@ -1,0 +1,18 @@
+<!-- to delete -->
+{% extends "base.html" %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+<h1>Главная страница</h1>
+<p><strong>User ID:</strong> {{ user.user_id }}</p>
+<p><strong>Имя:</strong> {{ user.first_name }}</p>
+<p><strong>Фамилия:</strong> {{ user.last_name }}</p>
+<p><strong>Номер телефона:</strong> {{ user.phone }}</p>
+<p><strong>Регион (ID):</strong> {{ user.region_id }}</p>
+<p><strong>Роли:</strong>
+    {% if user.is_sale %} Продавець {% endif %}
+    {% if user.is_purchase %} Закупівля {% endif %}
+    {% if user.is_rental %} Аренда {% endif %}
+</p>
+{% endblock %}
