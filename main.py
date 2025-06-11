@@ -2,18 +2,33 @@ from flask import Flask, session, redirect, url_for, request, render_template, j
 from sqlalchemy import or_
 from flask_caching import Cache
 import datetime
-from extensions import db
+from extensions import db, init_app
 from models import *
 import requests
 from functools import wraps
+import os
 app = Flask(__name__)
 app.secret_key = 'key123'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:james_132587@localhost/TgWebAppDatabase'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:james_132587@localhost/TgWebAppDatabase'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'DATABASE_URL',
+    'postgresql://flask_user:flask_pass@db:5432/flask_db'
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['CACHE_TYPE'] = 'simple'
 app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 cache = Cache(app)
-db.init_app(app)
+init_app(app)
+
+@app.before_request
+def create_tables():
+    print('ok')
+    db.create_all()
+    db.session.add(Region('Test-oblast-1','Test-district-1'))
+    db.session.add(Region('Test-oblast-2','Test-district-2'))
+    db.session.commit()
+
+
 
 def cache_user():
     if 'telegram_user_id' not in session and not cache.get('user'):
@@ -104,6 +119,7 @@ def register():
             else:
                 return redirect(url_for('rental_offers')) #jsonify({'redirect': url_for('rental_offers')})
     regions = Region.query.all()
+    print(regions)
     return render_template('register_d.html',
                            regions=regions,
                            telegram_first_name=session.get('telegram_first_name', ''),
@@ -685,7 +701,4 @@ def role_redirect():
                 return jsonify({'redirect': url_for('rental_offers')})
 
 if __name__ == '__main__':
-    with app.app_context():
-
-        db.create_all()
     app.run(debug=True, host="0.0.0.0", port=80)
