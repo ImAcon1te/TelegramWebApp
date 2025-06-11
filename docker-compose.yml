@@ -8,6 +8,23 @@ services:
     environment:
       FLASK_APP: main.py
       FLASK_RUN_HOST: 0.0.0.0
-      FLASK_ENV: production
+      FLASK_ENV: development
+      DATABASE_URL: postgresql://flask_user:flask_pass@db:5432/flask_db
+    depends_on:
+      - db
     volumes:
       - .:/app
+
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: flask_user
+      POSTGRES_PASSWORD: flask_pass
+      POSTGRES_DB: flask_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+

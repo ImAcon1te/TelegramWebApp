@@ -42,6 +42,10 @@ class Region(db.Model):
     def __repr__(self):
         return f"<Region {self.oblast}, {self.district}>"
 
+    def __init__(self, oblast, district):
+        self.oblast = oblast
+        self.district = district
+
 class User(db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.BigInteger, primary_key=True)
