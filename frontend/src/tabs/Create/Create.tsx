@@ -1,25 +1,29 @@
-import {FormEvent, useState} from "react";
+import {FormEvent, useEffect, useState} from "react";
 import {postCreate} from "../../service/service.ts";
 import {CreateOfferData} from "../../types/forms.ts";
 import {RolesMap} from "../../types/common.ts";
-import {RegionsMock} from "../../mocks/Regions.ts";
 import {Select} from "../../components/Select/Select.tsx";
 import {OfferOptions} from "../../constants.ts";
 import {Input} from "../../components/Input/Input.tsx";
 import {TextArea} from "../../components/TextArea/TextArea.tsx";
+import {useRegions} from "../../service/useRegions.ts";
+import {useOfferTypes} from "../../service/useOfferTypes.ts";
 
 export const Create = () => {
-  const regions = RegionsMock;
+  const {data: regions} = useRegions();
+  const {data: offerTypes} = useOfferTypes();
+  console.log('offerTypes', offerTypes)
 
   const [formData, setFormData] = useState<CreateOfferData>({
     offer_type: RolesMap.CULTURE,
     price: 100,
     additional_info: '',
-    region_id: regions.length > 0 ? regions[0].id : 0,
+    region_id: undefined,
     tonnage: 1,
     days: 1,
     type_id: undefined
   });
+
   const onChange = (
     name: string,
     value: any
@@ -38,6 +42,14 @@ export const Create = () => {
       window.location.href = resp.url;
     }
   };
+
+  useEffect(() => {
+    if(!formData.region_id && regions?.length){
+      onChange('region_id', regions[0].id)
+    }
+  }, [regions])
+
+  console.log('form', formData)
   return <form onSubmit={handleSubmit} className="form-wrapper">
     <div className="form-title">
       На цій сторінці ви можете створити власне оголошення, яке буде зображено усім користувачам системи
@@ -55,10 +67,10 @@ export const Create = () => {
       value={formData.type_id}
       required
       onChange={(value) => onChange('type_id', value)}
-      options={regions.map(item=>({
+      options={regions?.map(item=>({
         label: `${item.oblast} - ${item.district}`,
         value: item.id
-      }))}
+      })) || []}
       maxWidth="235px"
     />
     <Input
@@ -96,10 +108,10 @@ export const Create = () => {
       value={formData.region_id}
       required
       onChange={(value) => onChange('region_id', value)}
-      options={regions.map(item=>({
+      options={regions?.map(item=>({
         label: `${item.oblast} - ${item.district}`,
         value: item.id
-      }))}
+      })) || []}
       maxWidth="235px"
     />
     <TextArea

@@ -1,24 +1,42 @@
 import {Input} from "../Input/Input.tsx";
 import {Select} from "../Select/Select.tsx";
 import {Button} from "../Button/Button.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {UserFormData} from "../../types/forms.ts";
-import {RegionsMock} from "../../mocks/Regions.ts";
+import {useRegions} from "../../service/useRegions.ts";
 interface UserFormProps {
   onSubmit: (formData: UserFormData) => void,
-  buttonText: string
+  buttonText: string,
+  initData?: Partial<UserFormData>
 }
 export const UserForm:React.FC<UserFormProps> = ({
   onSubmit,
-  buttonText
+  buttonText,
+  initData
 }) => {
-  const regions = RegionsMock;
+  const {data: regions} = useRegions();
   const [formData, setFormData] = useState<UserFormData>({
     firstName: '',
     lastName: '',
     phone: '',
-    region_id: regions.length > 0 ? regions[0].id : undefined,
+    region_id: regions?.length ? regions[0].id : undefined,
   });
+
+  useEffect(() => {
+    if(initData){
+      setFormData(prev=>({
+        ...prev,
+        ...initData
+      }))
+    }
+
+  },[initData])
+
+  useEffect(() => {
+    if(!formData.region_id && regions?.length){
+      onChange('region_id', regions[0].id)
+    }
+  }, [regions])
   const onChange = (
     name: string,
     value: any
@@ -28,6 +46,7 @@ export const UserForm:React.FC<UserFormProps> = ({
       [name]: value
     }))
   }
+  console.log('form data', formData)
   return (
     <form
       onSubmit={(e) => {
@@ -54,6 +73,8 @@ export const UserForm:React.FC<UserFormProps> = ({
       <Input
         label="Номер телефону"
         value={formData.phone}
+        pattern="^(?:\+?380|0)\d{9}$"
+        type="text"
         placeholder="Введіть..."
         required
         onChange={(value) => onChange('phone', value)}
@@ -64,10 +85,10 @@ export const UserForm:React.FC<UserFormProps> = ({
         placeholder="Введіть..."
         required
         onChange={(value) => onChange('region_id', value)}
-        options={regions.map(item=>({
+        options={regions?.map(item=>({
           label: `${item.oblast} - ${item.district}`,
           value: item.id
-        }))}
+        })) || []}
       />
       <div className="center-form-button">
         <Button isSubmit>{buttonText}</Button>

@@ -2,7 +2,7 @@ import {RolesMap} from "./common.ts";
 
 export interface CreateOfferData{
   offer_type: RolesMap,
-  region_id: number,
+  region_id: number | undefined,
   price: number
   additional_info: string
   type_id: number | undefined,

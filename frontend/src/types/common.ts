@@ -10,7 +10,15 @@ export interface Region {
   district?: string;
 }
 
-
+export interface UserFormData {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  region: number | string;
+  isSale: boolean;
+  isPurchase: boolean;
+  isRental: boolean;
+}
 export interface OfferType {
   id: number,
   code: string,

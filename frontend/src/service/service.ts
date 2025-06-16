@@ -3,8 +3,9 @@ import {CreateOfferData, UserFormData} from "../types/forms.ts";
 export const getTgId = () => {
   return 556717307
 }
-export const getHeaders = () => {
+export const getInitForGet = () => {
   return {
+    method: "GET",
     headers: {
       'Content-Type': 'application/json'
     },
@@ -29,14 +30,17 @@ export const postRegistration = async (formData: UserFormData) => {
   }).then(resp=>resp.json());
 }
 
-export const getUser = async () => {
-  fetch(
-    `/user?=${getTgId()}`
-  )
-  .then(res => {
-    if (!res.ok) throw new Error('Ошибка сети');
-    return res.json();
-  })
+export const postUpdateUser = async (formData: UserFormData) => {
+  const body = getBody(formData)
+
+  return await fetch(`/user/update`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': ' application/json'
+    },
+    credentials: 'same-origin'
+  }).then(resp=>resp.json());
 }
 
 export const postCreate = (formData: CreateOfferData) => {

@@ -1,24 +1,29 @@
 import {useQuery} from "@tanstack/react-query";
-import {getHeaders, getTgId} from "./service.ts";
+import {getTgId} from "./service.ts";
+import {UserData} from "../types/responses.ts";
 
 export const useUser = () => {
-  console.log( {
-    ...getHeaders()
-  })
-  return useQuery({
+  return useQuery<UserData>({
     queryKey: ['user'],
-    queryFn: () =>
-      fetch(
-        `/user?user_id=${getTgId()}`,
-        {
-          ...getHeaders()
-        }
-      )
-        .then(res => {
-          if (!res.ok) throw new Error('Ошибка сети');
-          return res.json();
-        }),
+    queryFn: async () => {
+      const res = await fetch(`/user/${getTgId()}`, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!res.ok) {
+        // HTTP-ошибка
+        throw new Error(`Ошибка сети: ${res.status}`);
+      }
+
+      const data = await res.json();
+      if (data.message && data.message !== 'success') {
+        // Важно: без кавычек вокруг data.message
+        throw new Error(data.message);
+      }
+      return data;
+    },
     staleTime: 60_000,
     refetchOnWindowFocus: false,
+    retry: false,
   });
 }

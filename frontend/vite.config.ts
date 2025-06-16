@@ -8,6 +8,7 @@ export default defineConfig({
     })
   ],
   server: {
+    allowedHosts: ['https://barnacle-trusted-informally.ngrok-free.app/'],
     proxy: {
       // ловим точный путь /register (POST, GET и т. д.)
       '/register': {
@@ -16,6 +17,16 @@ export default defineConfig({
         secure: false,
       },
       '/user': {
+        target: 'http://localhost:80', // порт вашего бэка
+        changeOrigin: true,
+        secure: false,
+      },
+      '/regions': {
+        target: 'http://localhost:80', // порт вашего бэка
+        changeOrigin: true,
+        secure: false,
+      },
+      '/offer': {
         target: 'http://localhost:80', // порт вашего бэка
         changeOrigin: true,
         secure: false,

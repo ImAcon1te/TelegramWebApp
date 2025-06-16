@@ -23,7 +23,7 @@ app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 cache = Cache(app)
 init_app(app)
 
-# @app.route('/create_db', methods=['POST'])
+@app.route('/create_db', methods=['POST'])
 def create_db():
     db.drop_all()
     db.create_all()
@@ -288,6 +288,8 @@ def create_offer_type(json_data):
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         db.session.rollback()
+        print(e)
+        raise e
         return jsonify({"error": "Internal Server Error"}), 500
 
 #TODO: test /offer
@@ -318,18 +320,17 @@ def get_offer(json_data):
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/regions', methods=['GET'])
-@validate_json(required_keys=['telegram_user_id'])
-def get_regions(json_data):
-    telegram_user_id = session.get('telegram_user_id')
-    if str(json_data.get('telegram_user_id')) != str(telegram_user_id):
-        return jsonify({"error": "User mismatch"}), 403
+def get_regions():
+    query_telegram_user_id = request.args.get('telegram_user_id')
+    region_id = request.args.get('id')  # опционально
+
     try:
-        if json_data.get('id'):
-            region = db.session.query(Region).filter_by(id=json_data.get('id')).first()
+        if region_id:
+            region = db.session.query(Region).filter_by(id=region_id).first()
             if region:
                 return jsonify(region.to_dict()), 200
             else:
-                return jsonify({'message':f"region with id='{json_data.get('id')} not exists'"}), 200
+                return jsonify({'message': f"region with id='{region_id}' not exists"}), 200
         else:
             regions = db.session.query(Region).all()
             return jsonify([region.to_dict() for region in regions]), 200
@@ -342,7 +343,7 @@ def get_regions(json_data):
 @app.route('/user/<id>', methods=['GET'])
 def get_user(id):
     try:
-        user = db.session.query(User).filter_by(id=id).first()
+        user = db.session.query(User).filter_by(user_id=id).first()
         if user:
             return jsonify(user.to_dict()), 200
         else:
@@ -351,6 +352,8 @@ def get_user(id):
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         db.session.rollback()
+        print(e)
+        raise e
         return jsonify({"error": "Internal Server Error"}), 500
 
 if __name__ == '__main__':
