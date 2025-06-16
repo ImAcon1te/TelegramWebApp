@@ -98,3 +98,10 @@
 .form-title{
     margin-bottom: 10px;
 }
+
+.center-form-button{
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+
+}

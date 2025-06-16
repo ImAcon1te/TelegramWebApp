@@ -1,5 +1,5 @@
 import {RolesMap, SelectOption} from "./types/common.ts";
-
+export const BASE_URL = 'http://localhost:80/'
 
 export const OfferOptions:SelectOption[] = [
   {

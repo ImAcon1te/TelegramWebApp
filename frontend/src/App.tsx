@@ -4,9 +4,10 @@ import { Routes, Route } from 'react-router-dom';
 import "./App.css"
 import "./styles/global.css"
 import "./styles/reset.css"
-import Registration from "./pages/Registration";
+import Registration from "./pages/Registration/Registration.tsx";
 import {MainLayout} from "./components/MainLayout.tsx";
 import MainPage from "./pages/MainPage/MainPage.tsx";
+import Settings from "./pages/Settings/Settings.tsx";
 
 // src/pages/Home.tsx
 export const Home = () => <h1>Главная страница</h1>;
@@ -20,11 +21,11 @@ export const NotFound = () => <h1>404 — Страница не найдена</
 const App = () => {
 
   return(
-    <div>
+    <div className="page">
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<MainPage />} />
-          <Route path="/about" element={<About />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
         <Route path="/registration" element={<Registration />} />

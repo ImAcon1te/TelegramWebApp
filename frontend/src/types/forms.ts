@@ -9,3 +9,10 @@ export interface CreateOfferData{
   tonnage: number,
   days: number
 }
+
+export interface UserFormData {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  region_id: number | string | undefined;
+}

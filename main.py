@@ -23,7 +23,7 @@ app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 cache = Cache(app)
 init_app(app)
 
-@app.route('/create_db', methods=['POST'])
+# @app.route('/create_db', methods=['POST'])
 def create_db():
     db.drop_all()
     db.create_all()

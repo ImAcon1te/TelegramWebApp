@@ -5,19 +5,23 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [
     react({
-      // прокидываем свою Babel-настройку
-      // babel: {
-      //   presets: [
-      //     [
-      //       // Поддержка JSX (auto runtime)
-      //       ['@babel/preset-react', { runtime: 'automatic' }],
-      //       // Поддержка TS без удаления enum и другого синтаксиса
-      //       ['@babel/preset-typescript', { onlyRemoveTypeImports: false }]
-      //     ]
-      //   ]
-      // }
     })
   ],
+  server: {
+    proxy: {
+      // ловим точный путь /register (POST, GET и т. д.)
+      '/register': {
+        target: 'http://localhost:80', // порт вашего бэка
+        changeOrigin: true,
+        secure: false,
+      },
+      '/user': {
+        target: 'http://localhost:80', // порт вашего бэка
+        changeOrigin: true,
+        secure: false,
+      },
+    }
+  },
   build: {
     outDir: '../static/frontend',
     assetsDir: '',
