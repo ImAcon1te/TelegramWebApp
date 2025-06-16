@@ -1,7 +1,8 @@
 from functools import wraps
 from flask import jsonify, request, redirect, url_for, session
-from main import cache
 from models import *
+
+
 
 def validate_json(required_keys=None):
     required_keys = required_keys or []
@@ -22,17 +23,6 @@ def validate_or_raise(condition, message):
     if not condition:
         raise ValueError(message)
 
-
-def cache_user():
-    if 'telegram_user_id' not in session and not cache.get('user'):
-            return redirect(url_for("index"))
-    else:
-        user = db.session.query(User).filter_by(user_id=session['telegram_user_id']).first()
-        if user:
-            cache.set('user', user)
-            return user
-        else:
-            return redirect(url_for("index"))
 
 def parse_positive_int(value, field_name):
     try:

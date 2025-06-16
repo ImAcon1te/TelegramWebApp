@@ -8,7 +8,7 @@ import requests
 from functools import wraps
 import os
 
-from utils import validate_json, validate_or_raise, cache_user, login_required, parse_positive_int, \
+from utils import validate_json, validate_or_raise, login_required, parse_positive_int, \
     parse_and_validate_region_id, parse_phone, parse_positive_numeric
 
 app = Flask(__name__)
@@ -31,6 +31,25 @@ def create_db():
     db.session.add(Region('Test-oblast-2','Test-district-2'))
     db.session.commit()
     return jsonify({'status':'ok'}), 200
+
+def cache_user():
+    if 'telegram_user_id' not in session and not cache.get('user'):
+            return redirect(url_for("index"))
+    else:
+        user = db.session.query(User).filter_by(user_id=session['telegram_user_id']).first()
+        if user:
+            cache.set('user', user)
+            return user
+        else:
+            return redirect(url_for("index"))
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'telegram_user_id' not in session and not cache.get('user'):
+            return redirect(url_for("index"))
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.route('/init_telegram', methods=['POST'])
 def init_telegram():
