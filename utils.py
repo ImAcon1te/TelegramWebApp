@@ -49,10 +49,4 @@ def parse_positive_numeric(value, field_name):
     except (ValueError, TypeError):
         raise ValueError(f"{field_name} must be numeric")
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'telegram_user_id' not in session and not cache.get('user'):
-            return redirect(url_for("index"))
-        return f(*args, **kwargs)
-    return decorated_function
+

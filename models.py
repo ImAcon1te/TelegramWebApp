@@ -31,6 +31,15 @@ class Region(db.Model):
         self.oblast = oblast
         self.district = district
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "oblast": self.oblast,
+            "district": self.district,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat()
+        }
+
 class OfferRequests(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.BigInteger, db.ForeignKey('users.user_id'), nullable=False)
@@ -124,7 +133,6 @@ class Vehicle(db.Model):
             "updated_at": self.updated_at.isoformat()
         }
 
-
 class User(db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.BigInteger, primary_key=True)
@@ -137,5 +145,17 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now)
     region = db.relationship('Region', backref=db.backref('users', lazy=True))
+
     def __repr__(self):
         return f"<User {self.user_id}: {self.first_name} {self.last_name}>"
+
+    def to_dict(self):
+        return {
+            "user_id": self.id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "phone": self.phone,
+            "region_id": self.region_id,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat()
+        }

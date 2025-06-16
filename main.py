@@ -8,7 +8,7 @@ import requests
 from functools import wraps
 import os
 
-from utils import validate_json, validate_or_raise, login_required, parse_positive_int, \
+from utils import validate_json, validate_or_raise, parse_positive_int, \
     parse_and_validate_region_id, parse_phone, parse_positive_numeric
 
 app = Flask(__name__)
@@ -317,7 +317,42 @@ def get_offer(json_data):
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
 
+@app.route('/regions', methods=['GET'])
+@validate_json(required_keys=['telegram_user_id'])
+def get_regions(json_data):
+    telegram_user_id = session.get('telegram_user_id')
+    if str(json_data.get('telegram_user_id')) != str(telegram_user_id):
+        return jsonify({"error": "User mismatch"}), 403
+    try:
+        if json_data.get('id'):
+            region = db.session.query(Region).filter_by(id=json_data.get('id')).first()
+            if region:
+                return jsonify(region.to_dict()), 200
+            else:
+                return jsonify({'message':f"region with id='{json_data.get('id')} not exists'"}), 200
+        else:
+            regions = db.session.query(Region).all()
+            return jsonify([region.to_dict() for region in regions]), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
 
+@app.route('/user', methods=['GET'])
+@validate_json(required_keys=['user_id'])
+def get_user(json_data):
+    try:
+        user = db.session.query(User).filter_by(id=json_data.get('telegram_user_id')).first()
+        if user:
+            return jsonify(user.to_dict()), 200
+        else:
+            return jsonify({'message': f"user with id='{json_data.get('id')} not exists'"}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
 
 if __name__ == '__main__':
     with app.app_context():
