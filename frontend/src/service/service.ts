@@ -21,8 +21,10 @@ export const postRegistration = async (formData: UserFormData) => {
 
   return await fetch(`/register`, {
     method: 'POST',
-
     body: JSON.stringify(body),
+    headers: {
+      'Content-Type': ' application/json'
+    },
     credentials: 'same-origin'
   }).then(resp=>resp.json());
 }
