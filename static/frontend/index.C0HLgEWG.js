@@ -1,0 +1,1 @@
+import{r as o,j as n}from"./main.js";var u=o();function i({initCounter:t}){const[s,r]=u.useState(t||0);return n.jsxs("button",{onClick:()=>r(e=>e+1),children:["count is ",s," sss21"]})}export{i as default};

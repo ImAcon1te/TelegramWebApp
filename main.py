@@ -1,4 +1,6 @@
 from flask import Flask, session, redirect, url_for, request, render_template, jsonify
+from flask.json.provider import DefaultJSONProvider
+from sqlalchemy.orm import DeclarativeMeta
 from sqlalchemy import or_
 from flask_caching import Cache
 import datetime
@@ -7,7 +9,20 @@ from models import *
 import requests
 from functools import wraps
 import os
+
+class CustomJSONProvider(DefaultJSONProvider):
+    def default(self, o):
+        if isinstance(o.__class__, DeclarativeMeta):
+           return {
+               column.key: getattr(o, column.key)
+               for column in o.__mapper__.column_attrs
+           }
+        return super().default(o)
+
+
 app = Flask(__name__)
+app.json_provider_class = CustomJSONProvider
+app.json = CustomJSONProvider(app)
 app.secret_key = 'key123'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:james_132587@localhost/TgWebAppDatabase'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
@@ -20,13 +35,18 @@ app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 cache = Cache(app)
 init_app(app)
 
-@app.before_request
-def create_tables():
-    print('ok')
-    db.create_all()
-    db.session.add(Region('Test-oblast-1','Test-district-1'))
-    db.session.add(Region('Test-oblast-2','Test-district-2'))
-    db.session.commit()
+
+
+
+
+
+# @app.before_request
+# def create_tables():
+#     print('ok')
+#     db.create_all()
+#     db.session.add(Region('Test-oblast-1','Test-district-1'))
+#     db.session.add(Region('Test-oblast-2','Test-district-2'))
+#     db.session.commit()
 
 
 

@@ -45,10 +45,19 @@
     <!-- Заголовок / шапка страницы -->
     <header class="settings-header">
       <h2 class="settings-title">Реєстрація</h2>
+
     </header>
+  <div>
+    <div
+      data-component="Registration"
+      data-props='{ "regions":{{ regions | tojson | safe }}, "regions1": {{ regions | tojson | safe }} }'
+    />
+  </div>
 
     <form method="POST">
+
       <div class="form-group">
+
         <label for="first_name" class="form-label">Ім’я</label>
         <input
           type="text"
