@@ -339,15 +339,14 @@ def get_regions(json_data):
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
 
-@app.route('/user', methods=['GET'])
-@validate_json(required_keys=['user_id'])
-def get_user(json_data):
+@app.route('/user/<id>', methods=['GET'])
+def get_user(id):
     try:
-        user = db.session.query(User).filter_by(id=json_data.get('telegram_user_id')).first()
+        user = db.session.query(User).filter_by(id=id).first()
         if user:
             return jsonify(user.to_dict()), 200
         else:
-            return jsonify({'message': f"user with id='{json_data.get('id')} not exists'"}), 200
+            return jsonify({'message': f"user with id='{id} not exists'"}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
