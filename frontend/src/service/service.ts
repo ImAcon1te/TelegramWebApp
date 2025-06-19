@@ -12,17 +12,17 @@ export const getInitForGet = () => {
   }
 }
 const getBody = (body: object) => {
-  return {
+  return JSON.stringify({
     ...body,
     telegram_user_id: getTgId()
-  }
+  })
 }
 export const postRegistration = async (formData: UserFormData) => {
   const body = getBody(formData)
 
   return await fetch(`/register`, {
     method: 'POST',
-    body: JSON.stringify(body),
+    body: body,
     headers: {
       'Content-Type': ' application/json'
     },
@@ -35,7 +35,7 @@ export const postUpdateUser = async (formData: UserFormData) => {
 
   return await fetch(`/user/update`, {
     method: 'POST',
-    body: JSON.stringify(body),
+    body: body,
     headers: {
       'Content-Type': ' application/json'
     },
@@ -43,14 +43,16 @@ export const postUpdateUser = async (formData: UserFormData) => {
   }).then(resp=>resp.json());
 }
 
-export const postCreate = (formData: CreateOfferData) => {
-  return fetch('/register', {
+export const postCreate = async (formData: CreateOfferData) => {
+  const body = getBody(formData)
+  console.log('body', body)
+  return await fetch('/offer/create', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      'Content-Type': ' application/json'
     },
-    body: JSON.stringify(formData),
+    body: body,
     credentials: 'same-origin'
-  });
+  }).then(resp=>resp.json());;
 }
 

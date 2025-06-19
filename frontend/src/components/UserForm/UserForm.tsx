@@ -47,6 +47,7 @@ export const UserForm:React.FC<UserFormProps> = ({
     }))
   }
   console.log('form data', formData)
+
   return (
     <form
       onSubmit={(e) => {

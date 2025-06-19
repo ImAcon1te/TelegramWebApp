@@ -6,8 +6,7 @@ import {useUser} from "../service/useUser.ts";
 export const MainLayout: React.FC = () => {
   const navigate = useNavigate();
 
-  const {isLoading, data, isError, error} = useUser()
-  console.log(isLoading, data, isError, error)
+  const {isLoading, isError} = useUser()
 
   if(isLoading){
     return null

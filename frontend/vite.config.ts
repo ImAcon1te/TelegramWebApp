@@ -31,6 +31,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/offer/create': {
+        target: 'http://localhost:80', // порт вашего бэка
+        changeOrigin: true,
+        secure: false,
+      },
     }
   },
   build: {

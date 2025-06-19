@@ -16,7 +16,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
   const navigate = useNavigate();
   const {isLoading, data} = useUser()
 
-  console.log('data', data)
 
   const handleSubmit = async (formData: UserFormData) => {
     const resp = await postRegistration(formData)
