@@ -115,15 +115,15 @@ def create_offer(json_data):
 
         if offer_type == 'Culture':
             type_id = json_data.get('type_id')
-            validate_or_raise(type_id is not None, "commodity_type_id is required")
+            validate_or_raise(type_id is not None, "type_id (commodity) is required")
             exists = db.session.query(CommodityType.id).filter_by(id=type_id).first()
             validate_or_raise(exists is not None, "Invalid commodity_type_id (not exists)")
             offer_data["tonnage"] = parse_positive_int(json_data.get('tonnage'), "tonnage")
             offer_data["commodity_type_id"] = type_id
 
         elif offer_type == 'Vehicle':
-            type_id = json_data.get('vehicle_type_id')
-            validate_or_raise(type_id is not None, "vehicle_type_id is required")
+            type_id = json_data.get('type_id')
+            validate_or_raise(type_id is not None, "type_id (type) is required")
             exists = db.session.query(VehicleType.id).filter_by(id=type_id).first()
             validate_or_raise(exists is not None, "Invalid vehicle_type_id (not exists)")
             offer_data["days"] = parse_positive_int(json_data.get('days'), "days")
@@ -135,8 +135,6 @@ def create_offer(json_data):
 
     except Exception as e:
         db.session.rollback()
-        print(e)
-        raise e
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offer/update', methods=['PATCH'])
@@ -339,15 +337,13 @@ def get_offer():
 
     except Exception as e:
         db.session.rollback()
-        print(e)
-        raise e
         return jsonify({"error": "Internal Server Error"}), 500
 
 
-@app.route('/regions/<id>', methods=['GET'])
-def get_regions(id):
+@app.route('/regions', methods=['GET'])
+def get_regions():
     try:
-        if id:
+        if request.args.get('id'):
             region = db.session.query(Region).filter_by(id=id).first()
             if region:
                 return jsonify(region.to_dict()), 200

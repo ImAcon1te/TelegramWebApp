@@ -83,11 +83,11 @@ class Culture(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now)
-    user = db.relationship('User', backref=db.backref('sale_offers', lazy=True))
-    region = db.relationship('Region', backref=db.backref('sale_offers', lazy=True))
+    user = db.relationship('User', backref=db.backref('Culture_offers', lazy=True))
+    region = db.relationship('Region', backref=db.backref('Culture_offers', lazy=True))
 
     def __repr__(self):
-        return f"<SaleOffer {self.id} by User {self.user_id}>"
+        return f"<CultureOffer {self.id} by User {self.user_id}>"
 
     def to_dict(self):
         return {
@@ -102,7 +102,10 @@ class Culture(db.Model):
             "user_first_name": self.user.first_name,
             "user_image":"тут будет фото",
             "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat()
+            "updated_at": self.updated_at.isoformat(),
+            "user_last_name": self.user.last_name,
+            "user_first_name": self.user.first_name,
+            "user_image":"тут будет фото"
     }
 
 class Vehicle(db.Model):
@@ -118,10 +121,11 @@ class Vehicle(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now)
-    user = db.relationship('User', backref=db.backref('rental_offers', lazy=True))
+    user = db.relationship('User', backref=db.backref('Vehicle_offers', lazy=True))
+    region = db.relationship('Region', backref=db.backref('Vehicle_offers', lazy=True))
 
     def __repr__(self):
-        return f"<RentalOffer {self.id} by User {self.user_id}>"
+        return f"<VehicleOffer {self.id} by User {self.user_id}>"
 
     def to_dict(self):
         return {
@@ -136,7 +140,10 @@ class Vehicle(db.Model):
             "user_first_name": self.user.first_name,
             "user_image":"тут будет фото",
             "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat()
+            "updated_at": self.updated_at.isoformat(),
+            "user_last_name": self.user.last_name,
+            "user_first_name": self.user.first_name,
+            "user_image":"тут будет фото"
         }
 
 class User(db.Model):
