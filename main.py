@@ -95,7 +95,6 @@ def register(json_data):
         return jsonify({"message": "error"}), 500
 
 @app.route('/offer/create', methods=['POST'])
-@login_required
 @validate_json(required_keys=['telegram_user_id', "offer_type", "region_id", "type_id", "price"])
 def create_offer(json_data):
     offer_data = {
@@ -115,16 +114,16 @@ def create_offer(json_data):
             return jsonify({"error": "Invalid offer type"}), 400
 
         if offer_type == 'Culture':
-            type_id = json_data.get('commodity_type_id')
-            validate_or_raise(type_id is not None, "commodity_type_id is required")
+            type_id = json_data.get('type_id')
+            validate_or_raise(type_id is not None, "type_id (commodity) is required")
             exists = db.session.query(CommodityType.id).filter_by(id=type_id).first()
             validate_or_raise(exists is not None, "Invalid commodity_type_id (not exists)")
             offer_data["tonnage"] = parse_positive_int(json_data.get('tonnage'), "tonnage")
             offer_data["commodity_type_id"] = type_id
 
         elif offer_type == 'Vehicle':
-            type_id = json_data.get('vehicle_type_id')
-            validate_or_raise(type_id is not None, "vehicle_type_id is required")
+            type_id = json_data.get('type_id')
+            validate_or_raise(type_id is not None, "type_id (type) is required")
             exists = db.session.query(VehicleType.id).filter_by(id=type_id).first()
             validate_or_raise(exists is not None, "Invalid vehicle_type_id (not exists)")
             offer_data["days"] = parse_positive_int(json_data.get('days'), "days")
@@ -341,11 +340,10 @@ def get_offer():
         return jsonify({"error": "Internal Server Error"}), 500
 
 
-@app.route('/regions/<id>', methods=['GET'])
-@validate_json(required_keys=[])
-def get_regions(id):
+@app.route('/regions', methods=['GET'])
+def get_regions():
     try:
-        if id:
+        if request.args.get('id'):
             region = db.session.query(Region).filter_by(id=id).first()
             if region:
                 return jsonify(region.to_dict()), 200
