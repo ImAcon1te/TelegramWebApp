@@ -338,15 +338,15 @@ def get_offer(json_data):
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/regions/<id>', methods=['GET'])
-@validate_json(required_keys=['telegram_user_id'])
-def get_regions(json_data):
+@validate_json(required_keys=[])
+def get_regions(id):
     try:
-        if json_data.get('id'):
-            region = db.session.query(Region).filter_by(id=json_data.get('id')).first()
+        if id:
+            region = db.session.query(Region).filter_by(id=id).first()
             if region:
                 return jsonify(region.to_dict()), 200
             else:
-                return jsonify({'message':f"region with id='{json_data.get('id')} not exists'"}), 200
+                return jsonify({'message':f"region with id='{id} not exists'"}), 200
         else:
             regions = db.session.query(Region).all()
             return jsonify([region.to_dict() for region in regions]), 200
