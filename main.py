@@ -315,27 +315,31 @@ def delete_offer(json_data):
 
 
 @app.route('/offer', methods=['GET'])
-@validate_json(required_keys=['telegram_user_id', 'offer_type'])
-def get_offer(json_data):
+def get_offer():
     try:
+        telegram_user_id = request.args.get('telegram_user_id')
+        offer_type = request.args.get('offer_type')
+
+        if not telegram_user_id or not offer_type:
+            return jsonify({"error": "Missing required query parameters: telegram_user_id and offer_type"}), 400
+
         model_class = {
             'Culture': Culture,
             'Vehicle': Vehicle
-        }.get(json_data.get('offer_type'))
+        }.get(offer_type)
 
         if not model_class:
             return jsonify({"error": "Invalid offer_type"}), 400
 
         offers = db.session.query(model_class)\
-            .filter(model_class.user_id != json_data.get('telegram_user_id')).all()
+            .filter(model_class.user_id != telegram_user_id).all()
 
         return jsonify([offer.to_dict() for offer in offers]), 200
 
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
+
 
 @app.route('/regions/<id>', methods=['GET'])
 @validate_json(required_keys=[])
