@@ -26,8 +26,8 @@ export interface OfferType {
 }
 
 export enum RolesMap {
-  CULTURE = 'culture',
-  VEHICLE = 'vehicle'
+  CULTURE = 'Culture',
+  VEHICLE = 'Vehicle'
 }
 // export enum OffersTypeMap {
 //   CULTURE = 'culture',

@@ -95,7 +95,6 @@ def register(json_data):
         return jsonify({"message": "error"}), 500
 
 @app.route('/offer/create', methods=['POST'])
-@login_required
 @validate_json(required_keys=['telegram_user_id', "offer_type", "region_id", "type_id", "price"])
 def create_offer(json_data):
     offer_data = {
@@ -115,7 +114,7 @@ def create_offer(json_data):
             return jsonify({"error": "Invalid offer type"}), 400
 
         if offer_type == 'Culture':
-            type_id = json_data.get('commodity_type_id')
+            type_id = json_data.get('type_id')
             validate_or_raise(type_id is not None, "commodity_type_id is required")
             exists = db.session.query(CommodityType.id).filter_by(id=type_id).first()
             validate_or_raise(exists is not None, "Invalid commodity_type_id (not exists)")
@@ -136,6 +135,8 @@ def create_offer(json_data):
 
     except Exception as e:
         db.session.rollback()
+        print(e)
+        raise e
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offer/update', methods=['PATCH'])
@@ -338,11 +339,12 @@ def get_offer():
 
     except Exception as e:
         db.session.rollback()
+        print(e)
+        raise e
         return jsonify({"error": "Internal Server Error"}), 500
 
 
 @app.route('/regions/<id>', methods=['GET'])
-@validate_json(required_keys=[])
 def get_regions(id):
     try:
         if id:

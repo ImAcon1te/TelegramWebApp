@@ -1,13 +1,13 @@
 import {useQuery} from "@tanstack/react-query";
-import {getInitForGet} from "./service.ts";
+import {getInitForGet, getTgId} from "./service.ts";
 import {Regions} from "../types/responses.ts";
 
-export const useRegions = () => {
+export const useOffer = () => {
   return useQuery<Regions>({
     queryKey: ['regions1'],
     queryFn: () =>
       fetch(
-        `/regions`,
+        `/offer?telegram_user_id=${getTgId()}&offer_type=Culture`,
         getInitForGet()
       )
         .then(res => {

@@ -1,7 +1,8 @@
 import {CreateOfferData, UserFormData} from "../types/forms.ts";
 // import {BASE_URL} from "../constants.ts";
 export const getTgId = () => {
-  return 556717307
+  // return 556717307
+  return 551234
 }
 export const getInitForGet = () => {
   return {

@@ -9,16 +9,18 @@ import {TextArea} from "../../components/TextArea/TextArea.tsx";
 import {useRegions} from "../../service/useRegions.ts";
 import {useOfferTypes} from "../../service/useOfferTypes.ts";
 import {Button} from "../../components/Button/Button.tsx";
+import {useOffer} from "../../service/useOffers.ts";
 
 export const Create = () => {
   const {data: regions} = useRegions();
   const {data: offerTypes} = useOfferTypes();
-
+  const {data: offersData} = useOffer();
+  console.log('offersData', offersData)
   const [formData, setFormData] = useState<CreateOfferData>({
     offer_type: RolesMap.CULTURE,
     price: 100,
     additional_info: '',
-    region_id: undefined,
+    region_id: 1,
     tonnage: 1,
     days: 1,
     type_id: undefined
@@ -112,7 +114,7 @@ export const Create = () => {
     <Select
       label="Область"
       value={formData.region_id}
-      required
+      // required
       onChange={(value) => onChange('region_id', value)}
       options={regions?.map(item=>({
         label: `${item.oblast} - ${item.district}`,
