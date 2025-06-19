@@ -73,10 +73,6 @@ def init_telegram():
     else:
         return jsonify({'redirect': url_for('register')})
 
-@app.route('/')
-def index():
-    return render_template('telegram_init.html')
-
 @app.route('/register', methods=['POST'])
 @validate_json(required_keys=['telegram_user_id', 'firstName', 'phone', 'region_id'])
 def register(json_data):
@@ -102,11 +98,8 @@ def register(json_data):
 @login_required
 @validate_json(required_keys=['telegram_user_id', "offer_type", "region_id", "type_id", "price"])
 def create_offer(json_data):
-    telegram_user_id = session.get('telegram_user_id')
-    if str(json_data.get('telegram_user_id')) != str(telegram_user_id):
-        return jsonify({"error": "User mismatch"}), 403
     offer_data = {
-        "user_id": telegram_user_id,
+        "user_id": json_data.get('telegram_user_id'),
         "region_id": json_data.get('region_id'),
         "price": json_data.get('price'),
         "additional_info": json_data.get('additional_info'),
@@ -288,17 +281,42 @@ def create_offer_type(json_data):
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         db.session.rollback()
-        print(e)
-        raise e
         return jsonify({"error": "Internal Server Error"}), 500
 
-#TODO: test /offer
+@app.route('/offer/delete', methods=['POST'])
+@validate_json(required_keys=['telegram_user_id', 'offer_type', 'id'])
+def delete_offer(json_data):
+    try:
+        model_class = {
+            'Culture': Culture,
+            'Vehicle': Vehicle
+        }.get(json_data.get('offer_type'))
+
+        if not model_class:
+            return jsonify({"error": "Invalid offer_type"}), 400
+
+        offer = db.session.query(model_class).filter_by(
+            user_id=json_data['telegram_user_id'],
+            id=json_data['id']
+        ).first()
+
+        if not offer:
+            return jsonify({"error": "Offer not found"}), 404
+
+        db.session.delete(offer)
+        db.session.commit()
+        return jsonify({'message': 'offer deleted'}), 200
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
+
+
 @app.route('/offer', methods=['GET'])
 @validate_json(required_keys=['telegram_user_id', 'offer_type'])
 def get_offer(json_data):
-    telegram_user_id = session.get('telegram_user_id')
-    if str(json_data.get('telegram_user_id')) != str(telegram_user_id):
-        return jsonify({"error": "User mismatch"}), 403
     try:
         model_class = {
             'Culture': Culture,
@@ -309,7 +327,7 @@ def get_offer(json_data):
             return jsonify({"error": "Invalid offer_type"}), 400
 
         offers = db.session.query(model_class)\
-            .filter(model_class.user_id != telegram_user_id).all()
+            .filter(model_class.user_id != json_data.get('telegram_user_id')).all()
 
         return jsonify([offer.to_dict() for offer in offers]), 200
 
@@ -319,18 +337,16 @@ def get_offer(json_data):
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
 
-@app.route('/regions', methods=['GET'])
-def get_regions():
-    query_telegram_user_id = request.args.get('telegram_user_id')
-    region_id = request.args.get('id')  # опционально
-
+@app.route('/regions/<id>', methods=['GET'])
+@validate_json(required_keys=['telegram_user_id'])
+def get_regions(json_data):
     try:
-        if region_id:
-            region = db.session.query(Region).filter_by(id=region_id).first()
+        if json_data.get('id'):
+            region = db.session.query(Region).filter_by(id=json_data.get('id')).first()
             if region:
                 return jsonify(region.to_dict()), 200
             else:
-                return jsonify({'message': f"region with id='{region_id}' not exists"}), 200
+                return jsonify({'message':f"region with id='{json_data.get('id')} not exists'"}), 200
         else:
             regions = db.session.query(Region).all()
             return jsonify([region.to_dict() for region in regions]), 200
@@ -352,8 +368,6 @@ def get_user(id):
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         db.session.rollback()
-        print(e)
-        raise e
         return jsonify({"error": "Internal Server Error"}), 500
 
 if __name__ == '__main__':
