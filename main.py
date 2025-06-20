@@ -7,6 +7,9 @@ from models import *
 import requests
 from functools import wraps
 import os
+# временно для генерации тестовых данных
+from random import choice, randint, uniform
+from faker import Faker
 
 from utils import validate_json, validate_or_raise, parse_positive_int, \
     parse_and_validate_region_id, parse_phone, parse_positive_numeric
@@ -22,15 +25,14 @@ app.config['CACHE_TYPE'] = 'simple'
 app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 cache = Cache(app)
 init_app(app)
+fake = Faker('uk_UA')
 
 @app.route('/create_db', methods=['POST'])
 def create_db():
     db.drop_all()
     db.create_all()
-    db.session.add(Region('Test-oblast-1','Test-district-1'))
-    db.session.add(Region('Test-oblast-2','Test-district-2'))
     db.session.commit()
-    return jsonify({'status':'ok'}), 200
+    return jsonify({'status':'db recreated'}), 200
 
 def cache_user():
     if 'telegram_user_id' not in session and not cache.get('user'):
@@ -50,6 +52,117 @@ def login_required(f):
             return redirect(url_for("index"))
         return f(*args, **kwargs)
     return decorated_function
+
+# генератор данных
+@app.route('/generate-test-data', methods=['POST'])
+def generate_test_data():
+    try:
+        from urllib.parse import parse_qs
+        from sqlalchemy import delete
+
+        # Параметры из query
+        truncate = request.args.get('truncate', 'false').lower() == 'true'
+        user_count = int(request.args.get('users', 10))
+        offer_count = int(request.args.get('offers', 10))
+        request_count = int(request.args.get('requests', 20))
+
+        # Очистка БД (опционально)
+        if truncate:
+            db.session.execute(delete(OfferRequests))
+            db.session.execute(delete(Culture))
+            db.session.execute(delete(Vehicle))
+            db.session.execute(delete(User))
+            db.session.execute(delete(Region))
+            db.session.commit()
+
+        # 1. Регионы
+        regions = []
+        for _ in range(5):
+            region = Region(oblast=fake.region(), district=fake.city())
+            db.session.add(region)
+            regions.append(region)
+        db.session.flush()
+
+        # 2. Пользователи
+        users = []
+        for _ in range(user_count):
+            user = User(
+                user_id=fake.unique.random_int(100000, 999999),
+                first_name=fake.first_name(),
+                last_name=fake.last_name(),
+                phone=fake.unique.phone_number(),
+                region_id=choice(regions).id
+            )
+            db.session.add(user)
+            users.append(user)
+        db.session.flush()
+
+        # 3. Типы
+        commodity_types = db.session.query(CommodityType).all()
+        vehicle_types = db.session.query(VehicleType).all()
+        if not commodity_types or not vehicle_types:
+            return jsonify({"error": "Seed commodity_types and vehicle_types first"}), 400
+
+        # 4. Предложения
+        culture_offers = []
+        vehicle_offers = []
+        for _ in range(offer_count):
+            if choice([True, False]):
+                offer = Culture(
+                    user_id=choice(users).user_id,
+                    commodity_type_id=choice(commodity_types).id,
+                    tonnage=round(uniform(10, 100), 1),
+                    price=round(uniform(5000, 15000), 2),
+                    region_id=choice(regions).id,
+                    additional_info=fake.sentence()
+                )
+                db.session.add(offer)
+                culture_offers.append(offer)
+            else:
+                offer = Vehicle(
+                    user_id=choice(users).user_id,
+                    vehicle_type_id=choice(vehicle_types).id,
+                    days=randint(1, 30),
+                    price=round(uniform(1000, 10000), 2),
+                    region_id=choice(regions).id,
+                    additional_info=fake.sentence()
+                )
+                db.session.add(offer)
+                vehicle_offers.append(offer)
+        db.session.flush()
+
+        # 5. Заявки
+        for _ in range(request_count):
+            if culture_offers and choice([True, False]):
+                offer = choice(culture_offers)
+                offer_type = OfferTypeEnum.CultureOffer
+            else:
+                offer = choice(vehicle_offers)
+                offer_type = OfferTypeEnum.VehicleOffer
+
+            other_users = [u for u in users if u.user_id != offer.user_id]
+            if not other_users:
+                continue
+
+            req = OfferRequests(
+                user_id=choice(other_users).user_id,
+                offer_id=offer.id,
+                offer_type=offer_type,
+                status=choice(list(StatusEnum)),
+                overwrite_sum=round(offer.price * uniform(0.8, 1.1), 2),
+                overwrite_amount=round(uniform(1, 20), 1),
+                comment=fake.sentence()
+            )
+            db.session.add(req)
+
+        db.session.commit()
+        return jsonify({"message": "Test data generated"}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
+
+
 
 @app.route('/init_telegram', methods=['POST'])
 def init_telegram():
@@ -312,7 +425,6 @@ def delete_offer(json_data):
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
 
-
 @app.route('/offer', methods=['GET'])
 def get_offer():
     try:
@@ -338,7 +450,6 @@ def get_offer():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
-
 
 @app.route('/regions', methods=['GET'])
 def get_regions():
@@ -371,6 +482,148 @@ def get_user(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
+
+@app.route('/offer/request', methods=['POST'])
+@validate_json(required_keys=['telegram_user_id', 'offer_id', 'offer_type'])
+def create_offer_request(json_data):
+    try:
+        offer_type_raw = json_data['offer_type']
+        offer_id = json_data['offer_id']
+        telegram_user_id = json_data['telegram_user_id']
+
+        offer_type_enum_map = {
+            'Culture': OfferTypeEnum.CultureOffer,
+            'Vehicle': OfferTypeEnum.VehicleOffer
+        }
+
+        offer_type = offer_type_enum_map.get(offer_type_raw)
+        if not offer_type:
+            return jsonify({"error": "Invalid offer_type"}), 400
+
+        offer_model_map = {
+            OfferTypeEnum.CultureOffer: Culture,
+            OfferTypeEnum.VehicleOffer: Vehicle
+        }
+        model_class = offer_model_map[offer_type]
+        offer = db.session.query(model_class).filter_by(id=offer_id).first()
+        if not offer:
+            return jsonify({"error": "Offer not found"}), 404
+
+        offer_request = OfferRequests(
+            user_id=telegram_user_id,
+            offer_id=offer_id,
+            offer_type=offer_type,
+            status=StatusEnum.pending,
+            overwrite_sum=json_data.get('overwrite_sum'),
+            overwrite_amount=json_data.get('overwrite_amount'),
+            comment=json_data.get('comment')
+        )
+
+        db.session.add(offer_request)
+        db.session.commit()
+        return jsonify({"message": "Offer request created"}), 201
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
+
+@app.route('/offer/requests/sent', methods=['GET'])
+def get_sent_requests():
+    user_id = request.args.get('telegram_user_id')
+    try:
+        requests = db.session.query(OfferRequests).filter_by(user_id=user_id).all()
+        return jsonify([req.to_dict() for req in requests]), 200
+    except Exception as e:
+        return jsonify({"error": "Internal Server Error"}), 500
+
+@app.route('/offer/requests/received', methods=['GET'])
+def get_received_requests():
+    user_id = request.args.get('telegram_user_id')
+    try:
+        culture_ids = db.session.query(Culture.id).filter_by(user_id=user_id).subquery()
+        vehicle_ids = db.session.query(Vehicle.id).filter_by(user_id=user_id).subquery()
+
+        requests = db.session.query(OfferRequests).filter(
+            db.or_(
+                db.and_(
+                    OfferRequests.offer_type == OfferTypeEnum.CultureOffer,
+                    OfferRequests.offer_id.in_(culture_ids)
+                ),
+                db.and_(
+                    OfferRequests.offer_type == OfferTypeEnum.VehicleOffer,
+                    OfferRequests.offer_id.in_(vehicle_ids)
+                )
+            )
+        ).all()
+
+        return jsonify([req.to_dict() for req in requests]), 200
+
+    except Exception as e:
+        return jsonify({"error": "Internal Server Error"}), 500
+
+@app.route('/offer/update', methods=['PATCH'])
+@validate_json(required_keys=['telegram_user_id', 'offer_type', 'id'])
+def update_offer(json_data):
+    try:
+        user_id = json_data['telegram_user_id']
+        offer_type = json_data['offer_type']
+        offer_id = json_data['id']
+
+        model_map = {
+            'Culture': Culture,
+            'Vehicle': Vehicle
+        }
+
+        model = model_map.get(offer_type)
+        if not model:
+            return jsonify({"error": "Invalid offer_type"}), 400
+
+        offer = db.session.query(model).filter_by(id=offer_id, user_id=user_id).first()
+        if not offer:
+            return jsonify({"error": "Offer not found or access denied"}), 404
+
+        if 'price' in json_data:
+            offer.price = parse_positive_numeric(json_data['price'], 'price')
+
+        if 'region_id' in json_data:
+            offer.region_id = parse_and_validate_region_id(json_data['region_id'])
+
+        if 'additional_info' in json_data:
+            offer.additional_info = json_data['additional_info']
+
+        if offer_type == 'Culture':
+            if 'tonnage' in json_data:
+                offer.tonnage = parse_positive_numeric(json_data['tonnage'], 'tonnage')
+            if 'type_id' in json_data:
+                type_id = json_data['type_id']
+                validate_or_raise(
+                    db.session.query(CommodityType.id).filter_by(id=type_id).first() is not None,
+                    "Invalid commodity_type_id"
+                )
+                offer.commodity_type_id = type_id
+
+        elif offer_type == 'Vehicle':
+            if 'days' in json_data:
+                offer.days = parse_positive_int(json_data['days'], 'days')
+            if 'type_id' in json_data:
+                type_id = json_data['type_id']
+                validate_or_raise(
+                    db.session.query(VehicleType.id).filter_by(id=type_id).first() is not None,
+                    "Invalid vehicle_type_id"
+                )
+                offer.vehicle_type_id = type_id
+
+        db.session.commit()
+        return jsonify({"message": "Offer updated successfully"}), 200
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
+
 
 if __name__ == '__main__':
     with app.app_context():

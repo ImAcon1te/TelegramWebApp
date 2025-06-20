@@ -53,6 +53,29 @@ class OfferRequests(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     deleted_at = db.Column(db.DateTime, default=None, nullable=True)
 
+    def to_dict(self):
+        offer_data = None
+        if self.offer_type == OfferTypeEnum.CultureOffer:
+            offer = db.session.query(Culture).filter_by(id=self.offer_id).first()
+            offer_data = offer.to_dict() if offer else None
+        elif self.offer_type == OfferTypeEnum.VehicleOffer:
+            offer = db.session.query(Vehicle).filter_by(id=self.offer_id).first()
+            offer_data = offer.to_dict() if offer else None
+
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "offer_id": self.offer_id,
+            "offer_type": self.offer_type.value,
+            "status": self.status.value,
+            "overwrite_sum": float(self.overwrite_sum) if self.overwrite_sum else None,
+            "overwrite_amount": float(self.overwrite_amount) if self.overwrite_amount else None,
+            "comment": self.comment,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+            "offer": offer_data
+        }
+
 class CommodityType(db.Model):
     __tablename__ = 'commodity_types'
     id = db.Column(db.Integer, primary_key=True)
