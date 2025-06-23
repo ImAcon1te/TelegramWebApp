@@ -5,7 +5,6 @@ import {UserFormData} from "../../types/forms.ts";
 import {useNavigate} from "react-router-dom";
 import {UserForm} from "../../components/UserForm/UserForm.tsx";
 import {useUser} from "../../service/useUser.ts";
-import {useOffer} from "../../service/useOffers.ts";
 
 
 // Props для формы регистрации
@@ -16,8 +15,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
 }) => {
   const navigate = useNavigate();
   const {isLoading, data} = useUser()
-  const {data: offersData} = useOffer();
-  console.log('offersdata', offersData)
 
   const handleSubmit = async (formData: UserFormData) => {
     const resp = await postRegistration(formData)

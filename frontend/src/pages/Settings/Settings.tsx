@@ -6,21 +6,22 @@ import {useNavigate} from "react-router-dom";
 import {UserForm} from "../../components/UserForm/UserForm.tsx";
 import {useUser} from "../../service/useUser.ts";
 import {useMemo} from "react";
+import {ArrowBackIcon} from "../../assets/icons/arrow-back-icon.tsx";
 
-
-// Props для формы регистрации
-interface RegistrationFormProps {
-}
-
-const SettingsForm: React.FC<RegistrationFormProps> = ({
+const SettingsForm: React.FC = ({
 }) => {
   const {data: userData} = useUser()
 
   const navigate = useNavigate();
   const handleSubmit = async (formData: UserFormData) => {
-    const resp = await postUpdateUser(formData)
-    if(resp.message === 'success'){
-      navigate('/', { replace: true })
+    await postUpdateUser(formData)
+  };
+
+  const handleBack = () => {
+    if (window.history.length > 2) {
+      navigate(-1); // вернуться назад
+    } else {
+      navigate('/'); // если истории нет — на главную
     }
   };
   const initData = useMemo(() => {
@@ -35,7 +36,10 @@ const SettingsForm: React.FC<RegistrationFormProps> = ({
   }, [userData])
   return (
     <div className={styles.settings}>
-      <h1 className={styles.title}>Налаштування</h1>
+      <div className={styles.header}>
+        <ArrowBackIcon className={styles.back} onClick={handleBack} />
+        <h1 className={styles.title}>Налаштування</h1>
+      </div>
       <UserForm onSubmit={handleSubmit} buttonText="Зберегти налаштування" initData={initData} />
     </div>
   );

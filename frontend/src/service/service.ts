@@ -1,4 +1,5 @@
-import {CreateOfferData, UserFormData} from "../types/forms.ts";
+import {OfferData, UserFormData} from "../types/forms.ts";
+import {RolesMap} from "../types/common.ts";
 // import {BASE_URL} from "../constants.ts";
 export const getTgId = () => {
   // return 556717307
@@ -44,7 +45,7 @@ export const postUpdateUser = async (formData: UserFormData) => {
   }).then(resp=>resp.json());
 }
 
-export const postCreate = async (formData: CreateOfferData) => {
+export const postCreateOffer = async (formData: OfferData) => {
   const body = getBody(formData)
   console.log('body', body)
   return await fetch('/offer/create', {
@@ -57,3 +58,30 @@ export const postCreate = async (formData: CreateOfferData) => {
   }).then(resp=>resp.json());;
 }
 
+export const postUpdateOffer = async (formData: OfferData) => {
+  const body = getBody(formData)
+  return await fetch('/offer/update', {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': ' application/json'
+    },
+    body: body,
+    credentials: 'same-origin'
+  }).then(resp=>resp.json());;
+}
+
+
+export const postDeleteOffer = async (formData: {
+  "offer_type": RolesMap,
+  "id": number
+}) => {
+  const body = getBody(formData)
+  return await fetch('/offer/delete', {
+    method: 'POST',
+    headers: {
+      'Content-Type': ' application/json'
+    },
+    body: body,
+    credentials: 'same-origin'
+  }).then(resp=>resp.json());;
+}

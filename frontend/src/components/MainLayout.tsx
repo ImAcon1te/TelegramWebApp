@@ -2,6 +2,7 @@
 import {Outlet, useNavigate} from 'react-router-dom';
 import {Header} from "./Header/Header.tsx";
 import {useUser} from "../service/useUser.ts";
+import {RolesToggle} from "./RolesToggle/RolesToggle.tsx";
 
 export const MainLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -14,12 +15,16 @@ export const MainLayout: React.FC = () => {
     navigate('/registration', { replace: true })
   }
   return (
-    <div>
+    <>
       <Header />
-
       <main className="main">
-        <Outlet />
+        <div className="container">
+          <Outlet />
+
+        </div>
       </main>
-    </div>
+      <RolesToggle />
+    </>
+
   )
 };

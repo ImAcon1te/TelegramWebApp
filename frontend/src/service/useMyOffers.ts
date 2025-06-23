@@ -3,12 +3,12 @@ import {getInitForGet, getTgId} from "./service.ts";
 import {Offer} from "../types/responses.ts";
 import {RolesMap} from "../types/common.ts";
 
-export const useOffers = (offerType: RolesMap) => {
+export const useMyOffers = (offerType: RolesMap) => {
   return useQuery<Offer[]>({
-    queryKey: ['offers', offerType],
+    queryKey: ['myOffers', offerType],
     queryFn: () =>
       fetch(
-        `/offer?telegram_user_id=${getTgId()}&offer_type=${offerType}`,
+        `/offer/my?telegram_user_id=${getTgId()}&offer_type=${offerType}`,
         getInitForGet()
       )
         .then(res => {

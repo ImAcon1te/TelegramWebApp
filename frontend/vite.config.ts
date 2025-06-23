@@ -3,9 +3,10 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
+  appType: 'spa',
   plugins: [
-    react({
-    })
+    react({}),
+
   ],
   server: {
     allowedHosts: ['https://barnacle-trusted-informally.ngrok-free.app/'],

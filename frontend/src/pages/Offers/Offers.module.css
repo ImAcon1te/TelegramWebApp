@@ -1,0 +1,16 @@
+.links{
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.link{
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    vertical-align: middle;
+    text-decoration: underline;
+    text-decoration-style: solid;
+    color: var(--components-background);
+    cursor: pointer;
+}
