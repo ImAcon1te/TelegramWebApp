@@ -162,8 +162,6 @@ def generate_test_data():
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
 
-
-
 @app.route('/init_telegram', methods=['POST'])
 def init_telegram():
     data = request.get_json()
@@ -451,6 +449,32 @@ def get_offer():
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
 
+@app.route('/offer/my', methods=['GET'])
+def get_offer_my():
+    try:
+        telegram_user_id = request.args.get('telegram_user_id')
+        offer_type = request.args.get('offer_type')
+
+        if not telegram_user_id or not offer_type:
+            return jsonify({"error": "Missing required query parameters: telegram_user_id and offer_type"}), 400
+
+        model_class = {
+            'Culture': Culture,
+            'Vehicle': Vehicle
+        }.get(offer_type)
+
+        if not model_class:
+            return jsonify({"error": "Invalid offer_type"}), 400
+
+        offers = db.session.query(model_class)\
+            .filter(model_class.user_id == telegram_user_id).all()
+
+        return jsonify([offer.to_dict() for offer in offers]), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
+
 @app.route('/regions', methods=['GET'])
 def get_regions():
     try:
@@ -513,7 +537,7 @@ def create_offer_request(json_data):
             user_id=telegram_user_id,
             offer_id=offer_id,
             offer_type=offer_type,
-            status=StatusEnum.pending,
+            status=StatusEnum.Pending,
             overwrite_sum=json_data.get('overwrite_sum'),
             overwrite_amount=json_data.get('overwrite_amount'),
             comment=json_data.get('comment')

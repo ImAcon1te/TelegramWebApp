@@ -13,8 +13,14 @@ class OfferTypeEnum(enum.Enum):
         return mapping[self]
 
 class StatusEnum(enum.Enum):
-    active = "active"
-    pending = "pending"
+    Active = "active"
+    Pending = "pending"
+    def display(self):
+        mapping = {
+            StatusEnum.Active: "активна",
+            StatusEnum.Pending: "очікує",
+        }
+        return mapping[self]
 
 class Region(db.Model):
     __tablename__ = 'regions'
@@ -64,7 +70,7 @@ class OfferRequests(db.Model):
 
         return {
             "id": self.id,
-            "user_id": self.user_id,
+            "user": self.user.to_dict(),
             "offer_id": self.offer_id,
             "offer_type": self.offer_type.value,
             "status": self.status.value,
@@ -73,7 +79,7 @@ class OfferRequests(db.Model):
             "comment": self.comment,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "offer": offer_data
+            "offer":  offer_data.to_dict(),
         }
 
 class CommodityType(db.Model):
@@ -85,6 +91,13 @@ class CommodityType(db.Model):
     def __repr__(self):
         return f"<CommodityType {self.code}>"
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "code": self.code,
+            "name": self.name,
+        }
+
 class VehicleType(db.Model):
     __tablename__ = 'vehicle_types'
     id = db.Column(db.Integer, primary_key=True)
@@ -93,6 +106,13 @@ class VehicleType(db.Model):
 
     def __repr__(self):
         return f"<VehicleType {self.code}>"
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "code": self.code,
+            "name": self.name,
+        }
 
 class Culture(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -115,17 +135,14 @@ class Culture(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "user_id": self.user_id,
-            "commodity_type_id": self.commodity_type_id,
-            "region_id": self.region_id,
+            "user": self.user.to_dict(),
+            "commodity_type": self.commodity_type.to_dict(),
+            "region": self.region.to_dict(),
             "price": float(self.price),
             "tonnage": float(self.tonnage),
             "additional_info": self.additional_info,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "user_last_name": self.user.last_name,
-            "user_first_name": self.user.first_name,
-            "user_image":"тут будет фото"
     }
 
 class Vehicle(db.Model):
@@ -150,17 +167,14 @@ class Vehicle(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "user_id": self.user_id,
-            "vehicle_type_id": self.vehicle_type_id,
-            "region_id": self.region_id,
+            "user": self.self.user.to_dict(),
+            "vehicle_type": self.vehicle_type.to_dict(),
+            "region": self.region.to_dict(),
             "price": float(self.price),
             "days": self.days,
             "additional_info": self.additional_info,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "user_last_name": self.user.last_name,
-            "user_first_name": self.user.first_name,
-            "user_image":"тут будет фото"
         }
 
 class User(db.Model):
@@ -170,10 +184,11 @@ class User(db.Model):
     last_name = db.Column(db.String(100))
     phone = db.Column(db.String(20), unique=True)
     password_hash = db.Column(db.String(256))
-    region_id = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False)
+    image = db.Column(db.String(), default='../static/images/default-avatar.png')
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now)
+    region_id = db.Column(db.Integer, db.ForeignKey('regions.id'), nullable=False)
     region = db.relationship('Region', backref=db.backref('users', lazy=True))
 
     def __repr__(self):
@@ -185,7 +200,8 @@ class User(db.Model):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "phone": self.phone,
-            "region_id": self.region_id,
+            "region": self.region.to_dict(),
+            "user_image": self.image,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
         }
