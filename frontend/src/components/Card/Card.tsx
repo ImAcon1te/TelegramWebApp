@@ -43,10 +43,11 @@ export const Card:FC<CardProps> = ({offer, editHandle, deleteHandle, requestHand
             }
           </div>
 
-          {offer.additional_info && <div className={styles.additionalWrapper}>
-              <ArrowIcon/>
-            {offer.additional_info}
-          </div>}
+          <div className={styles.additionalWrapper}>
+            <ArrowIcon/>
+            {offer.commodity_type.name}
+          </div>
+
           <div className={styles.priceWrapper}>
             <span className={styles.currency}>грн</span>
             <span className={styles.price}>{offer.price}/</span>

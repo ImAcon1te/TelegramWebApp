@@ -8,11 +8,13 @@ import {useState} from "react";
 import {Offer} from "../../types/responses.ts";
 import {RequestModal} from "../../components/RequestModal/RequestModal.tsx";
 import {Tabs, TabsVariant} from "../../components/Tabs/Tabs.tsx";
+import {FilterModal} from "../../components/FilterModal/FilterModal.tsx";
 export const Offers = () => {
   const navigate = useNavigate();
   const {activeRole} = useAppStore();
   const {data: offersList, isLoading} = useOffers(activeRole);
   const [requestOffer, setRequestOffer] = useState<Offer | null>(null)
+  const [filterModal, setFilterModal] = useState<boolean>(false)
   console.log('requestModal')
   if(isLoading){
     return null
@@ -40,7 +42,10 @@ export const Offers = () => {
     <div>
       <Tabs variant={TabsVariant.MAIN} />
       <div className={styles.links}>
-        <div></div>
+        <div className={styles.link} onClick={() => setFilterModal(true)}>
+          <div className={styles.linkIcon} />
+          Фільтри
+        </div>
         <div className={styles.link} onClick={createHandle}>Створити заявку</div>
       </div>
       {offersList.map(offer => {
@@ -48,7 +53,7 @@ export const Offers = () => {
           <Card offer={offer} key={offer.id} requestHandle={() => setRequestOffer(offer)} />
         )
       })}
-
+      {filterModal && <FilterModal isOpen={filterModal} closeModal={() => setFilterModal(false)} />}
       {requestOffer && <RequestModal requestOffer={requestOffer} closeModal={() => setRequestOffer(null)}/>}
     </div>
   )

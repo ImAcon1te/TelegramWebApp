@@ -13,4 +13,13 @@
     text-decoration-style: solid;
     color: var(--components-background);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+.linkIcon{
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 1px solid var(--components-background)
 }

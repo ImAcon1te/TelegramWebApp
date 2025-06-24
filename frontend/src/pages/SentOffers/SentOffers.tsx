@@ -7,24 +7,16 @@ export const SentOffers = () => {
   const {activeRole} = useAppStore();
 
   const {data: sentList, isLoading} = useOffersSent(activeRole)
+  console.log('sentList', sentList)
   if(isLoading){
     return null
   }else if(!sentList || sentList.length < 1){
-    if(activeRole === RolesMap.CULTURE){
-      return (
-        <div>
-          <Tabs variant={TabsVariant.NOTIFICATIONS} />
-          <div className="no-text">У вас немає відправлених заявок на культуру</div>
-        </div>
-      )
-    }else{
-      return (
-        <div>
-          <Tabs variant={TabsVariant.NOTIFICATIONS} />
-          <div className="no-text">У вас немає відправлених заявок на техніку</div>
-        </div>
-      )
-    }
+    return (
+      <div>
+        <Tabs variant={TabsVariant.NOTIFICATIONS} />
+        <div className="no-text">У вас немає відправлених заявок на {activeRole === RolesMap.CULTURE ? 'культуру' : 'техніку'}</div>
+      </div>
+    )
   }
   return (
     <div>
