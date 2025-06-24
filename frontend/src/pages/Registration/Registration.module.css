@@ -1,0 +1,14 @@
+.registration{
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 30px 0;
+}
+
+.title{
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--components-background);
+}

@@ -1,0 +1,33 @@
+.btn{
+    text-align: center;
+    border-radius: 100px;
+    cursor: pointer;
+    font-size: 14px;
+    border: none;
+    outline: none;
+}
+.default{
+    background-color: #1a202e;
+    border: 1px solid #bdf5ef;
+    transition: background-color 0.3s;
+    color: var(--components-background);
+    padding: 14px 16px;
+
+}
+.reset{
+    background: transparent;
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    padding: 10px 16px;
+
+}
+.primary {
+    background: var(--components-background);
+    color: var(--bg-color);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    padding: 10px 16px;
+}

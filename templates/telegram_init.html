@@ -11,20 +11,20 @@ iniціалізація телеграм. Будь ласка, зачекайт�
   const data = {
       user: tg.initDataUnsafe.user
   };
-
-  fetch('/init_telegram', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-  })
-  .then(response => response.json())
-  .then(result => {
-      if(result.redirect) {
-          window.location.href = result.redirect;
-      } else {
-          console.error('Init error');
-      }
-  })
-  .catch(error => console.error('Error:', error));
+  console.log('tg.initDataUnsafe.user', tg.initDataUnsafe.user)
+  // fetch('/init_telegram', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify(data)
+  // })
+  // .then(response => response.json())
+  // .then(result => {
+  //     // if(result.redirect) {
+  //     //     window.location.href = result.redirect;
+  //     // } else {
+  //     //     console.error('Init error');
+  //     // }
+  // })
+  // .catch(error => console.error('Error:', error));
 </script>
 {% endblock %}

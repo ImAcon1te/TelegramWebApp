@@ -1,0 +1,138 @@
+:root {
+    --bg-color: #1a202e;
+    --primary-color: white;
+    --secondary-color: #808080;
+    --input-placeholder: #bdf5ef;
+    --border-color: #bdf5ef;
+    --components-background: #BDF5EF;
+    --select-option-checked: #1d333a;
+}
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.page{
+    height: 100vh;
+    background-color: var(--bg-color);
+    box-sizing: border-box;
+    color: var(--primary-color);
+    overflow: hidden;
+}
+.main{
+    margin-top: 64px;
+    margin-bottom: 90px;
+    overflow: auto;
+    height: calc(100vh - 64px - 90px);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-input {
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+    color: var(--primary-color)
+}
+/* Chrome, Safari, Edge */
+.form-input[type="number"]::-webkit-outer-spin-button,
+.form-input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+.form-input[type="number"] {
+    -moz-appearance: textfield;
+}
+.form-area {
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+    color: var(--primary-color);
+    height: 96px;
+    resize: none;
+
+}
+.form-select{
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #FFFFFF;
+    outline: none;
+    width: 100%;
+}
+.form-select option {
+    background-color: var(--bg-color);
+    color: var(--primary-color);
+}
+.offer-create-page form select option:checked {
+    background-color: var(--bg-color);
+    color: #fff;
+}
+.form-control::placeholder {
+    color: var(--input-placeholder);
+}
+
+.form-wrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.form-title{
+    margin-bottom: 10px;
+}
+
+.center-form-button{
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container{
+    max-width: 400px;
+    padding: 0 20px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.modal-actions{
+    margin-top: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
+
+.modal-text{
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.no-text{
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--primary-color);
+}
