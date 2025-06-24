@@ -1,0 +1,42 @@
+.roles{
+    position: fixed;
+    bottom: 25px;
+    left: 0;
+    right: 0;
+    width: 100%;
+}
+.wrapper{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #BDF5EF;
+    border-radius: 100px;
+    background: var(--bg-color);
+
+}
+.role{
+    height: 44px;
+    border-radius: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #BDF5EF;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    background: var(--bg-color);
+    cursor: pointer;
+}
+.role svg path{
+    stroke: var(--primary-color);
+}
+.roleActive {
+    color: var(--bg-color);
+    background: var(--components-background);
+}
+.roleActive svg path{
+    stroke: var(--bg-color);
+}

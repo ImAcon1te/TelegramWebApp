@@ -1,0 +1,25 @@
+.header{
+    position: fixed;
+    top: 0;
+    padding: 10px 20px 0 20px;
+    left: 0;
+    right: 0;
+    background-color: var(--bg-color);
+}
+.headerWrapper{
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 100px;
+    height: 44px;
+}
+.link{
+    height: 44px;
+    width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--components-background);
+    border-radius: 100px;
+}
