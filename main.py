@@ -527,7 +527,7 @@ def get_received_requests():
 
 @app.route('/offer/requests/update', methods=['PATCH'])
 @validate_json(required_keys=['telegram_user_id', 'offer_type', 'id'])
-def update_offer(json_data):
+def update_offer_request(json_data):
     try:
         user_id = json_data['telegram_user_id']
         offer_type = json_data['offer_type']
@@ -586,6 +586,27 @@ def update_offer(json_data):
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
 
+@app.route('/offer/requests/delete', methods=['POST'])
+@validate_json(required_keys=['telegram_user_id', 'offer_type', 'id'])
+def delete_offer_request(json_data):
+    try:
+        offer = db.session.query(OfferRequests).filter_by(
+            user_id=json_data['telegram_user_id'],
+            id=json_data['id']
+        ).first()
+
+        if not offer:
+            return jsonify({"error": "Offer request not found"}), 404
+
+        db.session.delete(offer)
+        db.session.commit()
+        return jsonify({'message': 'offer deleted'}), 200
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offers/search', methods=['GET'])
 def search_offers():
