@@ -19,10 +19,10 @@ body {
     overflow: hidden;
 }
 .main{
-    margin-top: 115px;
+    margin-top: 64px;
     margin-bottom: 90px;
     overflow: auto;
-    height: calc(100vh - 115px - 90px);
+    height: calc(100vh - 64px - 90px);
 }
 
 .form-group {

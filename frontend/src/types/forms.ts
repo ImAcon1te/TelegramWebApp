@@ -17,3 +17,13 @@ export interface UserFormData {
   phone: string;
   region_id: number | string | undefined;
 }
+
+export interface RequestOfferData{
+  "offer_type": RolesMap,
+  "offer_id": number,
+  "overwrite_sum": number,
+  "overwrite_amount": number,
+  "comment": string
+}
+export type RequestOfferDataBase = Omit<RequestOfferData, 'overwrite_sum' | 'overwrite_amount'> &
+  Partial<Pick<RequestOfferData, 'overwrite_sum' | 'overwrite_amount'>>

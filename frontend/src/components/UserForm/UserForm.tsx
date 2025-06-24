@@ -1,6 +1,6 @@
 import {Input} from "../Input/Input.tsx";
 import {Select} from "../Select/Select.tsx";
-import {Button} from "../Button/Button.tsx";
+import {Button, ButtonVariant} from "../Button/Button.tsx";
 import {useEffect, useState} from "react";
 import {UserFormData} from "../../types/forms.ts";
 import {useRegions} from "../../service/useRegions.ts";
@@ -92,7 +92,7 @@ export const UserForm:React.FC<UserFormProps> = ({
         })) || []}
       />
       <div className="center-form-button">
-        <Button isSubmit>{buttonText}</Button>
+        <Button variant={ButtonVariant.PRIMARY} isSubmit>{buttonText}</Button>
       </div>
     </form>
   )

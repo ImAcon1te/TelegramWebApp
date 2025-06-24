@@ -10,6 +10,7 @@ import {postDeleteOffer} from "../../service/service.ts";
 import {getOfferType} from "../../helpers/helpers.tsx";
 import {useQueryClient} from "@tanstack/react-query";
 import {RolesMap} from "../../types/common.ts";
+import {Tabs, TabsVariant} from "../../components/Tabs/Tabs.tsx";
 
 export const MyOffers = () => {
   const queryClient = useQueryClient();
@@ -22,9 +23,19 @@ export const MyOffers = () => {
     return null
   }else if(!myOffersList || myOffersList.length < 1){
     if(activeRole === RolesMap.CULTURE){
-      return <div className="no-text">У вас немає заявок на культуру</div>
+      return (
+        <div>
+          <Tabs variant={TabsVariant.MAIN} />
+          <div className="no-text">У вас немає створених заявок на культуру</div>
+        </div>
+      )
     }else{
-      return <div className="no-text">У вас немає заявок на техніку</div>
+      return (
+        <div>
+          <Tabs variant={TabsVariant.MAIN} />
+          <div className="no-text">У вас немає створених заявок на техніку</div>
+        </div>
+      )
     }
   }
   const editHandle = (offer: Offer) => {
@@ -48,6 +59,7 @@ export const MyOffers = () => {
   }
   return (
     <div>
+      <Tabs variant={TabsVariant.MAIN} />
       {myOffersList.map(offer => {
         return (
           <Card

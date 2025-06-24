@@ -1,4 +1,4 @@
-import {OfferData, UserFormData} from "../types/forms.ts";
+import {OfferData, RequestOfferDataBase, UserFormData} from "../types/forms.ts";
 import {RolesMap} from "../types/common.ts";
 // import {BASE_URL} from "../constants.ts";
 export const getTgId = () => {
@@ -77,6 +77,18 @@ export const postDeleteOffer = async (formData: {
 }) => {
   const body = getBody(formData)
   return await fetch('/offer/delete', {
+    method: 'POST',
+    headers: {
+      'Content-Type': ' application/json'
+    },
+    body: body,
+    credentials: 'same-origin'
+  }).then(resp=>resp.json());;
+}
+
+export const postRequestOffer = async (formData: RequestOfferDataBase) => {
+  const body = getBody(formData)
+  return await fetch('/offer/request', {
     method: 'POST',
     headers: {
       'Content-Type': ' application/json'

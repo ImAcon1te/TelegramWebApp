@@ -10,6 +10,7 @@ import {FC, useEffect, useState} from "react";
 import {OfferData} from "../../types/forms.ts";
 import {Offer} from "../../types/responses.ts";
 import {useAppStore} from "../../store/store.ts";
+import {getOfferType} from "../../helpers/helpers.tsx";
 
 interface OfferFormProps {
   handleSubmit: (formData: OfferData) => void
@@ -45,14 +46,14 @@ export const OfferForm:FC<OfferFormProps> = ({handleSubmit, title, initData, but
     if(initData){
       setFormData(prev=>({
         ...prev,
-        offer_type: initData.commodity_type_id ? RolesMap.CULTURE : RolesMap.VEHICLE,
+        offer_type: getOfferType(initData),
         price: initData.price || 1,
         additional_info: initData.additional_info || '',
-        region_id: initData.region_id || 1,
+        region_id: initData.region?.id || 1,
         tonnage: initData.tonnage || 1,
         days: initData.days || 1,
-        id: initData.id
-        // type_id: initData.type_id
+        id: initData.id,
+        type_id: initData.commodity_type?.id
       }))
     }else if(activeRole){
       setFormData(prev => ({

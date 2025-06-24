@@ -5,12 +5,15 @@ import {FC} from "react";
 import {ArrowIcon} from "../../assets/icons/right-arrow-icon.tsx";
 import {EditIcon} from "../../assets/icons/edit-icon.tsx";
 import {CrossIcon} from "../../assets/icons/cross-icon.tsx";
+import {PlusIcon} from "../../assets/icons/plus-icon.tsx";
 interface CardProps {
   offer: Offer
   editHandle?: () => void
   deleteHandle?: () => void
+  requestHandle?: () => void
+
 }
-export const Card:FC<CardProps> = ({offer, editHandle, deleteHandle}) => {
+export const Card:FC<CardProps> = ({offer, editHandle, deleteHandle, requestHandle}) => {
   return (
     <div className={styles.card}>
       <div className={styles.photoRatingWrapper}>
@@ -22,8 +25,8 @@ export const Card:FC<CardProps> = ({offer, editHandle, deleteHandle}) => {
         <div className={styles.offerWrapper}>
           <div className={styles.top}>
             <div className={styles.userWrapper}>
-              <div className={styles.userName}>{offer.user_first_name} {offer.user_last_name}</div>
-              <div className={styles.region}>{offer.region_id}</div>
+              <div className={styles.userName}>{offer.user.first_name} {offer.user.last_name}</div>
+              <div className={styles.region}>{offer.region.district}, {offer.region.oblast}</div>
             </div>
             {editHandle && deleteHandle &&<div className={styles.actions}>
               <div className={`${styles.action} ${styles.actionSuccess}`} onClick={editHandle}>
@@ -33,6 +36,11 @@ export const Card:FC<CardProps> = ({offer, editHandle, deleteHandle}) => {
                 <CrossIcon/>
               </div>
             </div>}
+            {
+              requestHandle && <div className={styles.requestAction} onClick={requestHandle}>
+                <PlusIcon />
+              </div>
+            }
           </div>
 
           {offer.additional_info && <div className={styles.additionalWrapper}>
@@ -44,9 +52,9 @@ export const Card:FC<CardProps> = ({offer, editHandle, deleteHandle}) => {
             <span className={styles.price}>{offer.price}/</span>
             <span className={styles.tonnage}>
               {
-                offer.commodity_type_id
+                offer.commodity_type
                   ? `${offer.tonnage}т`
-                  : 'test'
+                  : `${offer.days}д`
               }
             </span>
           </div>

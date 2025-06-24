@@ -190,7 +190,6 @@ class User(db.Model):
     last_name = db.Column(db.String(100))
     phone = db.Column(db.String(20), unique=True)
     password_hash = db.Column(db.String(256))
-    image = db.Column(db.String(), default='../static/images/default-avatar.png')
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now,
                            onupdate=datetime.datetime.now)
@@ -207,7 +206,6 @@ class User(db.Model):
             "last_name": self.last_name,
             "phone": self.phone,
             "region": self.region.to_dict(),
-            "user_image": self.image,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
         }

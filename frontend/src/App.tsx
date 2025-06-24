@@ -10,6 +10,8 @@ import {OfferEditPage} from "./pages/OfferEditPage/OfferEditPage.tsx";
 import {Offers} from "./pages/Offers/Offers.tsx";
 import {MyOffers} from "./pages/MyOffers/MyOffers.tsx";
 import {CreateOffer} from "./pages/CreateOffer/CreateOffer.tsx";
+import {ReceivedOffers} from "./pages/ReceivedOffers/ReceivedOffers.tsx";
+import {SentOffers} from "./pages/SentOffers/SentOffers.tsx";
 
 const App = () => {
 
@@ -22,6 +24,8 @@ const App = () => {
           <Route path="/" element={<Offers />} />
           <Route path="/my-offers" element={<MyOffers />} />
           <Route path="/offer/create" element={<CreateOffer />} />
+          <Route path="/received" element={<ReceivedOffers />} />
+          <Route path="/sent" element={<SentOffers />} />
 
         </Route>
 

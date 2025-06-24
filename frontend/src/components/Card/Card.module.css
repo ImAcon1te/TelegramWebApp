@@ -91,3 +91,15 @@
 .actionDanger{
     background: #8F0505;
 }
+
+.requestAction{
+    height: 44px;
+    width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--components-background);
+    border-radius: 50%;
+    transform: translateY(-4px);
+    cursor: pointer;
+}
