@@ -537,7 +537,7 @@ def create_offer_request(json_data):
             user_id=telegram_user_id,
             offer_id=offer_id,
             offer_type=offer_type,
-            status=StatusEnum.Pending,
+            status=StatusEnum.Pending.value,
             overwrite_sum=json_data.get('overwrite_sum'),
             overwrite_amount=json_data.get('overwrite_amount'),
             comment=json_data.get('comment')
@@ -587,7 +587,7 @@ def get_received_requests():
     except Exception as e:
         return jsonify({"error": "Internal Server Error"}), 500
 
-@app.route('/offer/update', methods=['PATCH'])
+@app.route('/offer/requests/update', methods=['PATCH'])
 @validate_json(required_keys=['telegram_user_id', 'offer_type', 'id'])
 def update_offer(json_data):
     try:
