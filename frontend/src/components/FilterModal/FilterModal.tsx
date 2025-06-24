@@ -1,18 +1,15 @@
 import {FC, useEffect, useState} from "react";
-import {Offer} from "../../types/responses.ts";
 import {Modal} from "../Modal/Modal.tsx";
 import {Button, ButtonVariant} from "../Button/Button.tsx";
-import {FilterOfferData, RequestOfferData, RequestOfferDataBase} from "../../types/forms.ts";
+import {FilterOfferData} from "../../types/forms.ts";
 import {RolesMap} from "../../types/common.ts";
-import {getOfferType} from "../../helpers/helpers.tsx";
 import {Input} from "../Input/Input.tsx";
-import {TextArea} from "../TextArea/TextArea.tsx";
-import styles from './RequestModal.module.css'
 import {postRequestOffer} from "../../service/service.ts";
 import {useAppStore} from "../../store/store.ts";
 import {Select} from "../Select/Select.tsx";
 import {useRegions} from "../../service/useRegions.ts";
 import {useOfferTypes} from "../../service/useOfferTypes.ts";
+import {usePriceRange} from "../../service/usePriceRange.ts";
 
 interface Props{
   isOpen: boolean
@@ -22,7 +19,10 @@ export const FilterModal:FC<Props> = ({isOpen, closeModal}) => {
   const {activeRole} = useAppStore()
   const {data: regions} = useRegions();
   const {data: offerTypes} = useOfferTypes();
-
+  const {data: priceRange} = usePriceRange({
+    offerType: activeRole
+  });
+  console.log('priceRange', priceRange)
   const [formData, setFormData] = useState<FilterOfferData>({
     offer_type: activeRole,
     price_end: 0,
