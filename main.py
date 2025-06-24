@@ -525,9 +525,9 @@ def get_received_requests():
     except Exception as e:
         return jsonify({"error": "Internal Server Error"}), 500
 
-@app.route('/offer/update', methods=['PATCH'])
+@app.route('/offer/requests/update', methods=['PATCH'])
 @validate_json(required_keys=['telegram_user_id', 'offer_type', 'id'])
-def update_offer(json_data):
+def update_offer_request(json_data):
     try:
         user_id = json_data['telegram_user_id']
         offer_type = json_data['offer_type']
@@ -585,6 +585,114 @@ def update_offer(json_data):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
+
+@app.route('/offer/requests/delete', methods=['POST'])
+@validate_json(required_keys=['telegram_user_id', 'offer_type', 'id'])
+def delete_offer_request(json_data):
+    try:
+        offer = db.session.query(OfferRequests).filter_by(
+            user_id=json_data['telegram_user_id'],
+            id=json_data['id']
+        ).first()
+
+        if not offer:
+            return jsonify({"error": "Offer request not found"}), 404
+
+        db.session.delete(offer)
+        db.session.commit()
+        return jsonify({'message': 'offer deleted'}), 200
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
+
+@app.route('/offers/search', methods=['GET'])
+def search_offers():
+    try:
+        offer_type = request.args.get('offer_type')
+        if offer_type not in ['Culture', 'Vehicle']:
+            return jsonify({"error": "Invalid offer_type"}), 400
+
+        model = Culture if offer_type == 'Culture' else Vehicle
+        query = db.session.query(model)
+
+        query = query.join(model.user).join(model.region)
+
+        price_start = request.args.get('price_start', type=float)
+        price_end = request.args.get('price_end', type=float)
+        if price_start is not None:
+            query = query.filter(model.price >= price_start)
+        if price_end is not None:
+            query = query.filter(model.price <= price_end)
+
+        name = request.args.get('name')
+        if name:
+            ilike = f"%{name.lower()}%"
+            query = query.filter(
+                db.func.lower(User.first_name + ' ' + User.last_name).ilike(ilike)
+            )
+
+        region_id = request.args.get('region', type=int)
+        if region_id:
+            query = query.filter(model.region_id == region_id)
+
+        type_id = request.args.get('type_id', type=int)
+        if type_id:
+            if offer_type == 'Culture':
+                query = query.filter(model.commodity_type_id == type_id)
+            else:
+                query = query.filter(model.vehicle_type_id == type_id)
+
+        offers = query.all()
+        return jsonify([offer.to_dict() for offer in offers]), 200
+
+    except Exception as e:
+        return jsonify({"error": "Internal Server Error"}), 500
+
+@app.route('/offers/price-range', methods=['GET'])
+def get_price_range():
+    try:
+        offer_type = request.args.get('offer_type')
+        if offer_type not in ['Culture', 'Vehicle']:
+            return jsonify({"error": "Invalid or missing offer_type"}), 400
+
+        model = Culture if offer_type == 'Culture' else Vehicle
+        query = db.session.query(model).join(model.user)
+
+        region_id = request.args.get('region', type=int)
+        if region_id:
+            query = query.filter(model.region_id == region_id)
+
+        type_id = request.args.get('type_id', type=int)
+        if type_id:
+            if offer_type == 'Culture':
+                query = query.filter(model.commodity_type_id == type_id)
+            else:
+                query = query.filter(model.vehicle_type_id == type_id)
+
+        name = request.args.get('name')
+        if name:
+            ilike = f"%{name.lower()}%"
+            query = query.filter(
+                db.func.lower(User.first_name + ' ' + User.last_name).ilike(ilike)
+            )
+
+        result = query.with_entities(
+            db.func.min(model.price).label('min_price'),
+            db.func.max(model.price).label('max_price')
+        ).first()
+
+        return jsonify({
+            "offer_type": offer_type,
+            "min_price": float(result.min_price) if result.min_price is not None else None,
+            "max_price": float(result.max_price) if result.max_price is not None else None
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": "Internal Server Error"}), 500
+
 
 
 if __name__ == '__main__':
