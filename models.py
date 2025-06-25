@@ -3,12 +3,12 @@ import enum
 from extensions import db
 
 class OfferTypeEnum(enum.Enum):
-    CultureOffer = "culture"
-    VehicleOffer = "vehicle"
+    cultureOffer = "culture"
+    vehicleOffer = "vehicle"
     def display(self):
         mapping = {
-            OfferTypeEnum.CultureOffer: "культури",
-            OfferTypeEnum.VehicleOffer: "техніка",
+            OfferTypeEnum.cultureOffer: "культури",
+            OfferTypeEnum.vehicleOffer: "техніка",
         }
         return mapping[self]
 

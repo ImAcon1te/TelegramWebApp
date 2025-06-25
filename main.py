@@ -135,10 +135,10 @@ def generate_test_data():
         for _ in range(request_count):
             if culture_offers and choice([True, False]):
                 offer = choice(culture_offers)
-                offer_type = OfferTypeEnum.CultureOffer
+                offer_type = OfferTypeEnum.cultureOffer
             else:
                 offer = choice(vehicle_offers)
-                offer_type = OfferTypeEnum.VehicleOffer
+                offer_type = OfferTypeEnum.vehicleOffer
 
             other_users = [u for u in users if u.user_id != offer.user_id]
             if not other_users:
@@ -217,14 +217,14 @@ def create_offer(json_data):
     try:
         offer_type = json_data.get('offer_type')
         model_class = {
-            'Culture': Culture,
-            'Vehicle': Vehicle
+            'culture': Culture,
+            'vehicle': Vehicle
         }.get(json_data.get('offer_type'))
 
         if not model_class:
             return jsonify({"error": "Invalid offer type"}), 400
 
-        if offer_type == 'Culture':
+        if offer_type == 'culture':
             type_id = json_data.get('type_id')
             validate_or_raise(type_id is not None, "type_id (commodity) is required")
             exists = db.session.query(CommodityType.id).filter_by(id=type_id).first()
@@ -232,7 +232,7 @@ def create_offer(json_data):
             offer_data["tonnage"] = parse_positive_int(json_data.get('tonnage'), "tonnage")
             offer_data["commodity_type_id"] = type_id
 
-        elif offer_type == 'Vehicle':
+        elif offer_type == 'vehicle':
             type_id = json_data.get('type_id')
             validate_or_raise(type_id is not None, "type_id (type) is required")
             exists = db.session.query(VehicleType.id).filter_by(id=type_id).first()
@@ -332,8 +332,8 @@ def create_offer_type(json_data):
 def delete_offer(json_data):
     try:
         model_class = {
-            'Culture': Culture,
-            'Vehicle': Vehicle
+            'culture': Culture,
+            'vehicle': Vehicle
         }.get(json_data.get('offer_type'))
 
         if not model_class:
@@ -367,8 +367,8 @@ def get_offer():
             return jsonify({"error": "Missing required query parameters: telegram_user_id and offer_type"}), 400
 
         model_class = {
-            'Culture': Culture,
-            'Vehicle': Vehicle
+            'culture': Culture,
+            'vehicle': Vehicle
         }.get(offer_type)
 
         if not model_class:
@@ -391,8 +391,8 @@ def get_offer_my():
             return jsonify({"error": "Missing required query parameters: telegram_user_id and offer_type"}), 400
 
         model_class = {
-            'Culture': Culture,
-            'Vehicle': Vehicle
+            'culture': Culture,
+            'vehicle': Vehicle
         }.get(offer_type)
 
         if not model_class:
@@ -448,8 +448,8 @@ def create_offer_request(json_data):
         telegram_user_id = json_data['telegram_user_id']
 
         offer_type_enum_map = {
-            'Culture': OfferTypeEnum.CultureOffer,
-            'Vehicle': OfferTypeEnum.VehicleOffer
+            'culture': OfferTypeEnum.cultureOffer,
+            'vehicle': OfferTypeEnum.vehicleOffer
         }
 
         offer_type = offer_type_enum_map.get(offer_type_raw)
@@ -457,8 +457,8 @@ def create_offer_request(json_data):
             return jsonify({"error": "Invalid offer_type"}), 400
 
         offer_model_map = {
-            OfferTypeEnum.CultureOffer: Culture,
-            OfferTypeEnum.VehicleOffer: Vehicle
+            OfferTypeEnum.cultureOffer: Culture,
+            OfferTypeEnum.vehicleOffer: Vehicle
         }
         model_class = offer_model_map[offer_type]
         offer = db.session.query(model_class).filter_by(id=offer_id).first()
@@ -506,12 +506,12 @@ def get_received_requests():
         requests = db.session.query(OfferRequests).filter(
             db.or_(
                 db.and_(
-                    OfferRequests.offer_type == OfferTypeEnum.CultureOffer,
+                    OfferRequests.offer_type == OfferTypeEnum.cultureOffer,
                     OfferRequests.status == StatusEnum.pending,
                     OfferRequests.offer_id.in_(culture_ids)
                 ),
                 db.and_(
-                    OfferRequests.offer_type == OfferTypeEnum.VehicleOffer,
+                    OfferRequests.offer_type == OfferTypeEnum.vehicleOffer,
                     OfferRequests.status == StatusEnum.pending,
                     OfferRequests.offer_id.in_(vehicle_ids)
                 )
@@ -586,8 +586,8 @@ def decline_offer_request(json_data):
             return jsonify({"error": "Offer request not found"}), 404
 
         model_class = {
-            'Culture': Culture,
-            'Vehicle': Vehicle
+            'culture': Culture,
+            'vehicle': Vehicle
         }.get(offer_request.offer_type)
 
         offer = db.session.query(model_class).filter_by(id=offer_request.offer_id).first()
@@ -608,10 +608,10 @@ def decline_offer_request(json_data):
 def search_offers():
     try:
         offer_type = request.args.get('offer_type')
-        if offer_type not in ['Culture', 'Vehicle']:
+        if offer_type not in ['culture', 'vehicle']:
             return jsonify({"error": "Invalid offer_type"}), 400
 
-        model = Culture if offer_type == 'Culture' else Vehicle
+        model = Culture if offer_type == 'culture' else Vehicle
         query = db.session.query(model)
 
         if not request.args.get('telegram_user_id'):
@@ -640,7 +640,7 @@ def search_offers():
 
         type_id = request.args.get('type_id', type=int)
         if type_id:
-            if offer_type == 'Culture':
+            if offer_type == 'culture':
                 query = query.filter(model.commodity_type_id == type_id)
             else:
                 query = query.filter(model.vehicle_type_id == type_id)
@@ -655,10 +655,10 @@ def search_offers():
 def get_price_range():
     try:
         offer_type = request.args.get('offer_type')
-        if offer_type not in ['Culture', 'Vehicle']:
+        if offer_type not in ['culture', 'vehicle']:
             return jsonify({"error": "Invalid or missing offer_type"}), 400
 
-        model = Culture if offer_type == 'Culture' else Vehicle
+        model = Culture if offer_type == 'culture' else Vehicle
         query = db.session.query(model).join(model.user)
         if not request.args.get('telegram_user_id'):
             return jsonify({"error": "telegram_user_id required"}), 400
@@ -670,7 +670,7 @@ def get_price_range():
 
         type_id = request.args.get('type_id', type=int)
         if type_id:
-            if offer_type == 'Culture':
+            if offer_type == 'culture':
                 query = query.filter(model.commodity_type_id == type_id)
             else:
                 query = query.filter(model.vehicle_type_id == type_id)
