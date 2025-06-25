@@ -142,9 +142,6 @@ class Culture(db.Model):
             "price": float(self.price),
             "tonnage": float(self.tonnage),
             "additional_info": self.additional_info,
-            "user_last_name": self.user.last_name,
-            "user_first_name": self.user.first_name,
-            "user_image":"тут будет фото",
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
     }
@@ -171,15 +168,12 @@ class Vehicle(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "user": self.self.user.to_dict(),
+            "user": self.user.to_dict(),
             "vehicle_type": self.vehicle_type.to_dict(),
             "region": self.region.to_dict(),
             "price": float(self.price),
             "days": self.days,
             "additional_info": self.additional_info,
-            "user_last_name": self.user.last_name,
-            "user_first_name": self.user.first_name,
-            "user_image":"тут будет фото",
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }
