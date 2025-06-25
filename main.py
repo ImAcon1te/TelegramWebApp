@@ -619,7 +619,7 @@ def search_offers():
 
         model = Culture if offer_type == 'Culture' else Vehicle
         query = db.session.query(model)
-
+        query = query.filter(model.user_id != request.args.get('telegram_user_id'))
         query = query.join(model.user).join(model.region)
 
         price_start = request.args.get('price_start', type=float)
@@ -661,6 +661,7 @@ def get_price_range():
             return jsonify({"error": "Invalid or missing offer_type"}), 400
 
         model = Culture if offer_type == 'Culture' else Vehicle
+        query = query.filter(model.user_id != request.args.get('telegram_user_id'))
         query = db.session.query(model).join(model.user)
 
         region_id = request.args.get('region', type=int)

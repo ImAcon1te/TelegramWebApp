@@ -13,8 +13,8 @@ class OfferTypeEnum(enum.Enum):
         return mapping[self]
 
 class StatusEnum(enum.Enum):
-    Active = "active"
-    Pending = "pending"
+    Active = "Active"
+    Pending = "Pending"
     def display(self):
         mapping = {
             StatusEnum.Active: "активна",
@@ -58,6 +58,7 @@ class OfferRequests(db.Model):
     overwrite_sum = db.Column(db.Numeric(10, 2), nullable=True)
     overwrite_amount = db.Column(db.Numeric(10, 2), nullable=True)
     comment = db.Column(db.Text, nullable=True)
+    user = db.relationship('User', backref=db.backref('Offer_requests', lazy=True))
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     deleted_at = db.Column(db.DateTime, default=None, nullable=True)
