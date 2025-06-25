@@ -540,8 +540,8 @@ def update_offer_request(json_data):
         if 'overwrite_sum' in json_data:
             offer.overwrite_amount = parse_positive_numeric(json_data['overwrite_sum'], 'overwrite_sum')
 
-        if 'additional_info' in json_data:
-            offer.additional_info = json_data['additional_info']
+        if 'comment' in json_data:
+            offer.comment = json_data['comment']
 
         db.session.commit()
         return jsonify({"message": "Offer requests updated successfully"}), 200
