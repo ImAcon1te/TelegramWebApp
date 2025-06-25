@@ -374,15 +374,12 @@ def get_offer():
         if not model_class:
             return jsonify({"error": "Invalid offer_type"}), 400
 
-        offers = db.session.query(model_class)\
-            .filter(model_class.user_id != telegram_user_id).all()
-
+        offers = db.session.query(model_class).filter(model_class.user_id != telegram_user_id).all()
         return jsonify([offer.to_dict() for offer in offers]), 200
 
     except Exception as e:
         db.session.rollback()
-        print(e)
-        raise e
+
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offer/my', methods=['GET'])
@@ -661,8 +658,8 @@ def get_price_range():
             return jsonify({"error": "Invalid or missing offer_type"}), 400
 
         model = Culture if offer_type == 'Culture' else Vehicle
-        query = query.filter(model.user_id != request.args.get('telegram_user_id'))
         query = db.session.query(model).join(model.user)
+        query = query.filter(model.user_id != request.args.get('telegram_user_id'))
 
         region_id = request.args.get('region', type=int)
         if region_id:
