@@ -524,59 +524,27 @@ def get_received_requests():
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offer/requests/update', methods=['PATCH'])
-@validate_json(required_keys=['telegram_user_id', 'offer_type', 'id'])
+@validate_json(required_keys=['telegram_user_id', 'id'])
 def update_offer_request(json_data):
     try:
         user_id = json_data['telegram_user_id']
-        offer_type = json_data['offer_type']
         offer_id = json_data['id']
 
-        model_map = {
-            'Culture': Culture,
-            'Vehicle': Vehicle
-        }
-
-        model = model_map.get(offer_type)
-        if not model:
-            return jsonify({"error": "Invalid offer_type"}), 400
-
-        offer = db.session.query(model).filter_by(id=offer_id, user_id=user_id).first()
+        offer = db.session.query(OfferRequests).filter_by(id=offer_id, user_id=user_id).first()
         if not offer:
             return jsonify({"error": "Offer not found or access denied"}), 404
 
-        if 'price' in json_data:
-            offer.price = parse_positive_numeric(json_data['price'], 'price')
+        if 'overwrite_amount' in json_data:
+            offer.overwrite_amount = parse_positive_numeric(json_data['overwrite_amount'], 'overwrite_amount')
 
-        if 'region_id' in json_data:
-            offer.region_id = parse_and_validate_region_id(json_data['region_id'])
+        if 'overwrite_sum' in json_data:
+            offer.overwrite_amount = parse_positive_numeric(json_data['overwrite_sum'], 'overwrite_sum')
 
         if 'additional_info' in json_data:
             offer.additional_info = json_data['additional_info']
 
-        if offer_type == 'Culture':
-            if 'tonnage' in json_data:
-                offer.tonnage = parse_positive_numeric(json_data['tonnage'], 'tonnage')
-            if 'type_id' in json_data:
-                type_id = json_data['type_id']
-                validate_or_raise(
-                    db.session.query(CommodityType.id).filter_by(id=type_id).first() is not None,
-                    "Invalid commodity_type_id"
-                )
-                offer.commodity_type_id = type_id
-
-        elif offer_type == 'Vehicle':
-            if 'days' in json_data:
-                offer.days = parse_positive_int(json_data['days'], 'days')
-            if 'type_id' in json_data:
-                type_id = json_data['type_id']
-                validate_or_raise(
-                    db.session.query(VehicleType.id).filter_by(id=type_id).first() is not None,
-                    "Invalid vehicle_type_id"
-                )
-                offer.vehicle_type_id = type_id
-
         db.session.commit()
-        return jsonify({"message": "Offer updated successfully"}), 200
+        return jsonify({"message": "Offer requests updated successfully"}), 200
 
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
