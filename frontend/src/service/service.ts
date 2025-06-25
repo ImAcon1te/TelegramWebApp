@@ -121,13 +121,25 @@ export const postRequestOffer = async (formData: RequestOfferDataBase) => {
   }).then(resp=>resp.json());;
 }
 
-export const postRequestOfferDelete = async (formData: {
+export const postRequestOfferSentDelete = async (formData: {
   "offer_type": RolesMap,
   "id": number
 }) => {
   const body = getBody(formData)
-  return await fetch('/offer/request', {
+  return await fetch('/offer/requests/delete', {
     method: 'POST',
+    headers: {
+      'Content-Type': ' application/json'
+    },
+    body: body,
+    credentials: 'same-origin'
+  }).then(resp=>resp.json());;
+}
+
+export const postRequestOfferUpdate = async (formData: RequestOfferDataBase) => {
+  const body = getBody(formData)
+  return await fetch('/offer/requests/update', {
+    method: 'PATCH',
     headers: {
       'Content-Type': ' application/json'
     },

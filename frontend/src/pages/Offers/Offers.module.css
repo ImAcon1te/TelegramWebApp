@@ -11,7 +11,7 @@
     vertical-align: middle;
     text-decoration: underline;
     text-decoration-style: solid;
-    color: var(--components-background);
+    color: var(--secondary-color);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -21,5 +21,5 @@
     width: 10px;
     border-radius: 50%;
     margin-right: 10px;
-    border: 1px solid var(--components-background)
+    border: 1px solid var(--secondary-color)
 }

@@ -9,7 +9,7 @@ export enum RolesMap {
   CULTURE = 'Culture',
   VEHICLE = 'Vehicle'
 }
-
+export type StatusType = "pending" | "active" | string;
 
 export interface TgUser {
   allows_write_to_pm: boolean

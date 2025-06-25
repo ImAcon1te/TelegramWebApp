@@ -1,4 +1,4 @@
-import {RolesMap} from "./common.ts";
+import {RolesMap, StatusType} from "./common.ts";
 
 export interface UserData{
   "user_id": number,
@@ -40,14 +40,26 @@ export type Offer = {
   additional_info: string;
   created_at: string;
   updated_at: string;
-  // commodity_type: CommodityType;
-  // vehicle_type: CommodityType
   region: Region;
   user: UserData;
   user_first_name: string;
   user_last_name: string;
   user_image: string;
 } & (OfferCommodity | OfferVehicle);
+
+export interface RequestOffer {
+  id: number;
+  offer_id: number;
+  offer_type: string;
+  status: StatusType;
+  overwrite_sum: number | null;
+  overwrite_amount: number;
+  comment: string;
+  created_at: string;
+  updated_at: string;
+  user: UserData;
+  offer: Offer;
+}
 
 export type PriceRangeData = {
   max_price: number

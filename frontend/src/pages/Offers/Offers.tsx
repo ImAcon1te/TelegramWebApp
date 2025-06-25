@@ -39,7 +39,6 @@ export const Offers = () => {
   const createHandle = () => {
     navigate(`/offer/create`)
   }
-
   if(isLoading){
     return null
   }else if(!offersList || offersList.length < 1){
@@ -74,7 +73,7 @@ export const Offers = () => {
         )
       })}
       {filterModal && <FilterModal currentFilters={filters} applyFilters={(data) => setFilters(data)} isOpen={filterModal} closeModal={() => setFilterModal(false)} /> }
-      {requestOffer && <RequestModal requestOffer={requestOffer} closeModal={() => setRequestOffer(null)}/>}
+      {requestOffer && <RequestModal isOpen={!!requestOffer} offer={requestOffer} closeModal={() => setRequestOffer(null)}/>}
     </div>
   )
 }

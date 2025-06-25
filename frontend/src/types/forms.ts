@@ -20,8 +20,9 @@ export interface UserFormData {
 
 export interface RequestOfferData{
   "offer_type": RolesMap,
-  "offer_id": number,
-  "overwrite_sum": number,
+  "offer_id"?: number,
+  "id"?: number,
+  "overwrite_sum"?: number,
   "overwrite_amount": number,
   "comment": string
 }

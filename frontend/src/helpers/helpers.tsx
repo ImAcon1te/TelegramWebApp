@@ -1,11 +1,20 @@
-import {Offer} from "../types/responses.ts";
+import {Offer, RequestOffer} from "../types/responses.ts";
 import {RolesMap} from "../types/common.ts";
 
-export const getOfferType = (offer?: Offer | Partial<Offer>) => {
+export const getOfferType = (offer?: Offer | Partial<Offer> | RequestOffer | Partial<RequestOffer>) => {
   if(!offer){
     return RolesMap.CULTURE
   }
-  return offer.commodity_type ? RolesMap.CULTURE : RolesMap.VEHICLE
+  if('commodity_type' in offer){
+    return RolesMap.CULTURE
+  }
+  else if('vehicle_type' in offer){
+    return RolesMap.VEHICLE
+  }else if('offer_type' in offer){
+    console.log('test', offer.offer_type)
+    return offer.offer_type === 'culture' ? RolesMap.CULTURE : RolesMap.VEHICLE
+  }
+  return RolesMap.CULTURE
 }
 
 

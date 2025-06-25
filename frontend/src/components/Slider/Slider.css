@@ -34,7 +34,7 @@
 }
 
 .slider__range {
-    background-color: var(--components-background);
+    background-color: var(--secondary-color);
     z-index: 2;
     transform: translateX(2px);
 }

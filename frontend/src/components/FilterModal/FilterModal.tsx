@@ -103,7 +103,7 @@ export const FilterModal:FC<Props> = ({isOpen, closeModal, applyFilters, current
               value={formData.price_end}
               placeholder="до"
               required
-              min={formData.price_start+1}
+              min={formData.price_start}
               max={priceRange?.max_price || 0}
               onChange={(e) => onChange('price_end', +e.target.value)}
             />

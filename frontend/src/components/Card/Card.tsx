@@ -11,12 +11,19 @@ interface CardProps {
   editHandle?: () => void
   deleteHandle?: () => void
   requestHandle?: () => void
+  isInnerCard?: boolean
 
 }
-export const Card:FC<CardProps> = ({offer, editHandle, deleteHandle, requestHandle}) => {
+export const Card:FC<CardProps> = ({
+  offer,
+  editHandle,
+  deleteHandle,
+  requestHandle,
+  isInnerCard
+}) => {
   const [descActive, setDescActive] = useState<boolean>(false);
   return (
-    <div className={styles.card}>
+    <div className={!isInnerCard ? styles.card : ''}>
       <div className={styles.cardWrapper}>
         <div className={styles.photoRatingWrapper}>
           <div className={styles.imageWrapper}>
@@ -50,10 +57,11 @@ export const Card:FC<CardProps> = ({offer, editHandle, deleteHandle, requestHand
               {offer.commodity_type?.name || offer.vehicle_type?.name}
             </div>
 
-            <div className={`${styles.additionalWrapper} ${descActive && styles.additionalWrapperActive}`} onClick={() => setDescActive(prev => !prev)}>
+            {offer.additional_info && <div className={`${styles.additionalWrapper} ${descActive && styles.additionalWrapperActive}`}
+                  onClick={() => setDescActive(prev => !prev)}>
               <ArrowDownIcon/>
               <span>більше...</span>
-            </div>
+            </div>}
 
 
           </div>

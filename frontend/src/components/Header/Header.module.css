@@ -20,7 +20,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--components-background);
+    background: var(--secondary-color);
     border-radius: 100px;
 }
 .link img{
