@@ -16,5 +16,6 @@ export const useOfferTypes = () => {
         }),
     staleTime: 60_000,
     refetchOnWindowFocus: false,
+    retry: false,
   });
 }

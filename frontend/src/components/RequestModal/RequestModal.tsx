@@ -45,8 +45,7 @@ export const RequestModal:FC<Props> = ({requestOffer, closeModal}) => {
     if(formData.offer_type === RolesMap.CULTURE && formData.overwrite_amount !== requestOffer.tonnage){
       data.overwrite_amount = formData.overwrite_amount
     }
-    const resp = await postRequestOffer(data)
-    console.log('resp', resp)
+    await postRequestOffer(data)
     closeModal()
   }
 

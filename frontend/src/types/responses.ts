@@ -1,3 +1,4 @@
+import {RolesMap} from "./common.ts";
 
 export interface UserData{
   "user_id": number,
@@ -35,3 +36,9 @@ export type Offer = {
   user_last_name: string;
   user_image: string;
 };
+
+export type PriceRangeData = {
+  max_price: number
+  min_price: number
+  offer_type: RolesMap
+}

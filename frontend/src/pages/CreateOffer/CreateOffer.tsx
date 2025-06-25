@@ -17,7 +17,6 @@ export const CreateOffer = () => {
       navigate('/my-offers')
 
     }
-    console.log('resp', resp)
   };
 
   return (

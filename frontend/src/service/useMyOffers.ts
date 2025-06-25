@@ -15,7 +15,9 @@ export const useMyOffers = (offerType: RolesMap) => {
           if (!res.ok) throw new Error('Ошибка сети');
           return res.json();
         }),
-    staleTime: 60_000,
+    staleTime: 3_000,
     refetchOnWindowFocus: false,
+    retry: false,
+    refetchOnMount: true
   });
 }

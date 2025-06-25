@@ -1,5 +1,4 @@
 import styles from "./Card.module.css"
-import UserPhoto from "../../assets/user-photo.png"
 import {Offer} from "../../types/responses.ts";
 import {FC} from "react";
 import {ArrowIcon} from "../../assets/icons/right-arrow-icon.tsx";
@@ -18,7 +17,7 @@ export const Card:FC<CardProps> = ({offer, editHandle, deleteHandle, requestHand
     <div className={styles.card}>
       <div className={styles.photoRatingWrapper}>
         <div className={styles.imageWrapper}>
-          <img src={UserPhoto} />
+          <img src="assets/user-photo.png" />
         </div>
       </div>
       <div className={styles.heightWrapper}>

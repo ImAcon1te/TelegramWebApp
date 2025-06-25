@@ -42,7 +42,6 @@ export const OfferForm:FC<OfferFormProps> = ({handleSubmit, title, initData, but
     }))
   }
   useEffect(() => {
-    console.log('initData', initData)
     if(initData){
       setFormData(prev=>({
         ...prev,
@@ -131,7 +130,7 @@ export const OfferForm:FC<OfferFormProps> = ({handleSubmit, title, initData, but
             onChange={(value) => onChange('days', +value)}
         />}
         <Select
-          label="Область"
+          label="Регіон"
           value={formData.region_id}
           // required
           onChange={(value) => onChange('region_id', value)}

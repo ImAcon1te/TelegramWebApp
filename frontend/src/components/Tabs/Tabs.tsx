@@ -20,7 +20,7 @@ interface Props {
 }
 export const Tabs:FC<Props> = ({variant}) => {
   const location = useLocation();
-
+  console.log('location tabs', location)
   const tabItems = useMemo(() => {
     if(variant === TabsVariant.NOTIFICATIONS){
       return tabItemsNotification

@@ -1,9 +1,33 @@
 import {OfferData, RequestOfferDataBase, UserFormData} from "../types/forms.ts";
-import {RolesMap} from "../types/common.ts";
-// import {BASE_URL} from "../constants.ts";
+import {RolesMap, TgUser} from "../types/common.ts";
+
+export const getTg = ()  => {
+  const hash = sessionStorage.getItem('tgWebAppHash');
+  console.log('hash', hash)
+  if(!hash) return null
+  const queryString = hash.replace(/^#\/?/, '');
+  const tgParams = new URLSearchParams(queryString);
+  const rawWebAppData = tgParams.get('tgWebAppData');
+  if (!rawWebAppData) return;
+  const innerParams = new URLSearchParams(rawWebAppData);
+  const userStr = innerParams.get('user');
+  try {
+    if (userStr) {
+      const decodedUser = decodeURIComponent(userStr);
+      const parsedUser = JSON.parse(decodedUser);
+      return parsedUser as TgUser
+    }
+  } catch (err) {
+    console.warn('Ошибка парсинга tgWebAppData:', err);
+  }
+
+}
 export const getTgId = () => {
-  // return 556717307
-  return 551234
+  const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  if(isLocalhost){
+    return  551234
+  }
+  return getTg()?.id
 }
 export const getInitForGet = () => {
   return {
@@ -47,7 +71,6 @@ export const postUpdateUser = async (formData: UserFormData) => {
 
 export const postCreateOffer = async (formData: OfferData) => {
   const body = getBody(formData)
-  console.log('body', body)
   return await fetch('/offer/create', {
     method: 'POST',
     headers: {
@@ -87,6 +110,21 @@ export const postDeleteOffer = async (formData: {
 }
 
 export const postRequestOffer = async (formData: RequestOfferDataBase) => {
+  const body = getBody(formData)
+  return await fetch('/offer/request', {
+    method: 'POST',
+    headers: {
+      'Content-Type': ' application/json'
+    },
+    body: body,
+    credentials: 'same-origin'
+  }).then(resp=>resp.json());;
+}
+
+export const postRequestOfferDelete = async (formData: {
+  "offer_type": RolesMap,
+  "id": number
+}) => {
   const body = getBody(formData)
   return await fetch('/offer/request', {
     method: 'POST',

@@ -1,23 +1,23 @@
 import {useQuery} from "@tanstack/react-query";
-import {getInitForGet, getTgId} from "./service.ts";
+import {getInitForGet} from "./service.ts";
 import {Offer} from "../types/responses.ts";
-import {RolesMap} from "../types/common.ts";
+import {FilterOfferData} from "../types/forms.ts";
+import {objectToQueryStringWithURL} from "../helpers/helpers.tsx";
 
-export const useOffersReceived = (offerType: RolesMap) => {
+export const useOffersFiltered = (filters: FilterOfferData | null) => {
   return useQuery<Offer[]>({
-    queryKey: ['offersReceived', offerType],
+    queryKey: ['offersFilteres', filters],
     queryFn: () =>
       fetch(
-        `/offer/requests/received?telegram_user_id=${getTgId()}`,
+        objectToQueryStringWithURL(`/offers/search`, filters),
         getInitForGet()
       )
         .then(res => {
           if (!res.ok) throw new Error('Ошибка сети');
           return res.json();
         }),
-    staleTime: 3_000,
     refetchOnWindowFocus: false,
     retry: false,
-    refetchOnMount: true
+    enabled: !!filters
   });
 }

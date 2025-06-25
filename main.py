@@ -498,6 +498,8 @@ def get_sent_requests():
         requests = db.session.query(OfferRequests).filter_by(user_id=user_id).all()
         return jsonify([req.to_dict() for req in requests]), 200
     except Exception as e:
+        print(e)
+        raise e
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offer/requests/received', methods=['GET'])

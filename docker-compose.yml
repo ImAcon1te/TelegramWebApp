@@ -5,6 +5,8 @@ services:
     build: .
     ports:
       - "80:80"
+    expose:
+      - "80"
     environment:
       FLASK_APP: main.py
       FLASK_RUN_HOST: 0.0.0.0
@@ -41,6 +43,20 @@ services:
       - db
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+
+  react:
+    container_name: react-dev
+    build:
+      context: ./frontend
+      dockerfile: dockerfile
+    ports:
+      - "5173:5173"  # Vite (или "3000:3000" для CRA)
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - IS_DOCKER=true
 volumes:
   pgdata:
   pgadmin_data:

@@ -1,6 +1,6 @@
 import {useQuery} from "@tanstack/react-query";
 import {getInitForGet} from "./service.ts";
-import {OfferTypesData} from "../types/responses.ts";
+import {PriceRangeData} from "../types/responses.ts";
 import {RolesMap} from "../types/common.ts";
 
 export const usePriceRange = ({
@@ -8,7 +8,7 @@ export const usePriceRange = ({
 }:{
   offerType: RolesMap
 }) => {
-  return useQuery<OfferTypesData>({
+  return useQuery<PriceRangeData>({
     queryKey: ['priceRange', offerType],
     queryFn: () =>
       fetch(
