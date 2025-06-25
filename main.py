@@ -379,7 +379,6 @@ def get_offer():
 
     except Exception as e:
         db.session.rollback()
-
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offer/my', methods=['GET'])
@@ -614,7 +613,11 @@ def search_offers():
 
         model = Culture if offer_type == 'Culture' else Vehicle
         query = db.session.query(model)
+
+        if not request.args.get('telegram_user_id'):
+            return jsonify({"error": "telegram_user_id required"}), 400
         query = query.filter(model.user_id != request.args.get('telegram_user_id'))
+
         query = query.join(model.user).join(model.region)
 
         price_start = request.args.get('price_start', type=float)
@@ -657,6 +660,8 @@ def get_price_range():
 
         model = Culture if offer_type == 'Culture' else Vehicle
         query = db.session.query(model).join(model.user)
+        if not request.args.get('telegram_user_id'):
+            return jsonify({"error": "telegram_user_id required"}), 400
         query = query.filter(model.user_id != request.args.get('telegram_user_id'))
 
         region_id = request.args.get('region', type=int)
