@@ -446,7 +446,6 @@ def get_offer():
 
     except Exception as e:
         db.session.rollback()
-
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offer/my', methods=['GET'])
@@ -537,7 +536,7 @@ def create_offer_request(json_data):
             user_id=telegram_user_id,
             offer_id=offer_id,
             offer_type=offer_type,
-            status=StatusEnum.Pending.value,
+            status=StatusEnum.pending,
             overwrite_sum=json_data.get('overwrite_sum'),
             overwrite_amount=json_data.get('overwrite_amount'),
             comment=json_data.get('comment')
@@ -559,8 +558,8 @@ def create_offer_request(json_data):
 def get_sent_requests():
     user_id = request.args.get('telegram_user_id')
     try:
-        requests = db.session.query(OfferRequests).filter_by(user_id=user_id).all()
-        return jsonify([req.to_dict() for req in requests]), 200
+        data = db.session.query(OfferRequests).filter_by(user_id=user_id, status=StatusEnum.pending).all()
+        return jsonify([req.to_dict() for req in data]), 200
     except Exception as e:
         print(e)
         raise e
@@ -577,10 +576,12 @@ def get_received_requests():
             db.or_(
                 db.and_(
                     OfferRequests.offer_type == OfferTypeEnum.CultureOffer,
+                    OfferRequests.status == StatusEnum.pending,
                     OfferRequests.offer_id.in_(culture_ids)
                 ),
                 db.and_(
                     OfferRequests.offer_type == OfferTypeEnum.VehicleOffer,
+                    OfferRequests.status == StatusEnum.pending,
                     OfferRequests.offer_id.in_(vehicle_ids)
                 )
             )
@@ -592,59 +593,27 @@ def get_received_requests():
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offer/requests/update', methods=['PATCH'])
-@validate_json(required_keys=['telegram_user_id', 'offer_type', 'id'])
+@validate_json(required_keys=['telegram_user_id', 'id'])
 def update_offer_request(json_data):
     try:
         user_id = json_data['telegram_user_id']
-        offer_type = json_data['offer_type']
         offer_id = json_data['id']
 
-        model_map = {
-            'Culture': Culture,
-            'Vehicle': Vehicle
-        }
-
-        model = model_map.get(offer_type)
-        if not model:
-            return jsonify({"error": "Invalid offer_type"}), 400
-
-        offer = db.session.query(model).filter_by(id=offer_id, user_id=user_id).first()
+        offer = db.session.query(OfferRequests).filter_by(id=offer_id, user_id=user_id).first()
         if not offer:
             return jsonify({"error": "Offer not found or access denied"}), 404
 
-        if 'price' in json_data:
-            offer.price = parse_positive_numeric(json_data['price'], 'price')
+        if 'overwrite_amount' in json_data:
+            offer.overwrite_amount = parse_positive_numeric(json_data['overwrite_amount'], 'overwrite_amount')
 
-        if 'region_id' in json_data:
-            offer.region_id = parse_and_validate_region_id(json_data['region_id'])
+        if 'overwrite_sum' in json_data:
+            offer.overwrite_amount = parse_positive_numeric(json_data['overwrite_sum'], 'overwrite_sum')
 
         if 'additional_info' in json_data:
             offer.additional_info = json_data['additional_info']
 
-        if offer_type == 'Culture':
-            if 'tonnage' in json_data:
-                offer.tonnage = parse_positive_numeric(json_data['tonnage'], 'tonnage')
-            if 'type_id' in json_data:
-                type_id = json_data['type_id']
-                validate_or_raise(
-                    db.session.query(CommodityType.id).filter_by(id=type_id).first() is not None,
-                    "Invalid commodity_type_id"
-                )
-                offer.commodity_type_id = type_id
-
-        elif offer_type == 'Vehicle':
-            if 'days' in json_data:
-                offer.days = parse_positive_int(json_data['days'], 'days')
-            if 'type_id' in json_data:
-                type_id = json_data['type_id']
-                validate_or_raise(
-                    db.session.query(VehicleType.id).filter_by(id=type_id).first() is not None,
-                    "Invalid vehicle_type_id"
-                )
-                offer.vehicle_type_id = type_id
-
         db.session.commit()
-        return jsonify({"message": "Offer updated successfully"}), 200
+        return jsonify({"message": "Offer requests updated successfully"}), 200
 
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -674,6 +643,36 @@ def delete_offer_request(json_data):
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
 
+@app.route('/offer/requests/decline', methods=['POST'])
+@validate_json(required_keys=['telegram_user_id', 'request_offer_id'])
+def decline_offer_request(json_data):
+    try:
+        offer_request = db.session.query(OfferRequests).filter_by(
+            id=json_data['request_offer_id']
+        ).first()
+
+        if not offer_request:
+            return jsonify({"error": "Offer request not found"}), 404
+
+        model_class = {
+            'Culture': Culture,
+            'Vehicle': Vehicle
+        }.get(offer_request.offer_type)
+
+        offer = db.session.query(model_class).filter_by(id=offer_request.offer_id).first()
+
+        if offer.user_id == json_data['telegram_user_id']:
+            offer_request.status = StatusEnum.declined
+            db.session.commit()
+            return jsonify({'message': 'offer declined'}), 200
+        else:
+            return jsonify({"error": "User isn't offer creator"}), 404
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
+
 @app.route('/offers/search', methods=['GET'])
 def search_offers():
     try:
@@ -683,7 +682,11 @@ def search_offers():
 
         model = Culture if offer_type == 'Culture' else Vehicle
         query = db.session.query(model)
+
+        if not request.args.get('telegram_user_id'):
+            return jsonify({"error": "telegram_user_id required"}), 400
         query = query.filter(model.user_id != request.args.get('telegram_user_id'))
+
         query = query.join(model.user).join(model.region)
 
         price_start = request.args.get('price_start', type=float)
@@ -726,6 +729,8 @@ def get_price_range():
 
         model = Culture if offer_type == 'Culture' else Vehicle
         query = db.session.query(model).join(model.user)
+        if not request.args.get('telegram_user_id'):
+            return jsonify({"error": "telegram_user_id required"}), 400
         query = query.filter(model.user_id != request.args.get('telegram_user_id'))
 
         region_id = request.args.get('region', type=int)

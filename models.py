@@ -13,12 +13,14 @@ class OfferTypeEnum(enum.Enum):
         return mapping[self]
 
 class StatusEnum(enum.Enum):
-    Active = "Active"
-    Pending = "Pending"
+    active = "active"
+    pending = "pending"
+    declined = 'declined'
     def display(self):
         mapping = {
-            StatusEnum.Active: "активна",
-            StatusEnum.Pending: "очікує",
+            StatusEnum.active: "активна",
+            StatusEnum.pending: "очікує",
+            StatusEnum.declined: "відхилено",
         }
         return mapping[self]
 
@@ -83,7 +85,7 @@ class OfferRequests(db.Model):
             "comment": self.comment,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "offer":  offer_data.to_dict(),
+            "offer":  offer_data,
         }
 
 class CommodityType(db.Model):
