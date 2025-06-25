@@ -469,7 +469,7 @@ def create_offer_request(json_data):
             user_id=telegram_user_id,
             offer_id=offer_id,
             offer_type=offer_type,
-            status=StatusEnum.Pending.value,
+            status=StatusEnum.pending,
             overwrite_sum=json_data.get('overwrite_sum'),
             overwrite_amount=json_data.get('overwrite_amount'),
             comment=json_data.get('comment')
@@ -491,8 +491,8 @@ def create_offer_request(json_data):
 def get_sent_requests():
     user_id = request.args.get('telegram_user_id')
     try:
-        requests = db.session.query(OfferRequests).filter_by(user_id=user_id).all()
-        return jsonify([req.to_dict() for req in requests]), 200
+        data = db.session.query(OfferRequests).filter_by(user_id=user_id, status=StatusEnum.pending).all()
+        return jsonify([req.to_dict() for req in data]), 200
     except Exception as e:
         return jsonify({"error": "Internal Server Error"}), 500
 
@@ -507,10 +507,12 @@ def get_received_requests():
             db.or_(
                 db.and_(
                     OfferRequests.offer_type == OfferTypeEnum.CultureOffer,
+                    OfferRequests.status == StatusEnum.pending,
                     OfferRequests.offer_id.in_(culture_ids)
                 ),
                 db.and_(
                     OfferRequests.offer_type == OfferTypeEnum.VehicleOffer,
+                    OfferRequests.status == StatusEnum.pending,
                     OfferRequests.offer_id.in_(vehicle_ids)
                 )
             )
@@ -598,6 +600,36 @@ def delete_offer_request(json_data):
         db.session.commit()
         return jsonify({'message': 'offer deleted'}), 200
 
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
+
+@app.route('/offer/requests/decline', methods=['POST'])
+@validate_json(required_keys=['telegram_user_id', 'request_offer_id'])
+def decline_offer_request(json_data):
+    try:
+        offer_request = db.session.query(OfferRequests).filter_by(
+            id=json_data['request_offer_id']
+        ).first()
+
+        if not offer_request:
+            return jsonify({"error": "Offer request not found"}), 404
+
+        model_class = {
+            'Culture': Culture,
+            'Vehicle': Vehicle
+        }.get(offer_request.offer_type)
+
+        offer = db.session.query(model_class).filter_by(id=offer_request.offer_id).first()
+
+        if offer.user_id == json_data['telegram_user_id']:
+            offer_request.status = StatusEnum.declined
+            db.session.commit()
+            return jsonify({'message': 'offer declined'}), 200
+        else:
+            return jsonify({"error": "User isn't offer creator"}), 404
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
