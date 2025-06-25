@@ -21,6 +21,17 @@ export interface OfferTypesData {
   "commodity_types": CommodityType[],
   "vehicle_types": CommodityType[]
 }
+
+type OfferCommodity = {
+  commodity_type: CommodityType;
+  vehicle_type?: never;
+};
+
+type OfferVehicle = {
+  vehicle_type: CommodityType;
+  commodity_type?: never;
+};
+
 export type Offer = {
   id: number;
   price: number;
@@ -29,13 +40,14 @@ export type Offer = {
   additional_info: string;
   created_at: string;
   updated_at: string;
-  commodity_type: CommodityType;
+  // commodity_type: CommodityType;
+  // vehicle_type: CommodityType
   region: Region;
   user: UserData;
   user_first_name: string;
   user_last_name: string;
   user_image: string;
-};
+} & (OfferCommodity | OfferVehicle);
 
 export type PriceRangeData = {
   max_price: number

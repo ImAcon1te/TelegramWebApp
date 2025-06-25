@@ -3,6 +3,9 @@
     border: 1px solid #BDF5EF;
     background: #37D19C1C;
     border-radius: 5px;
+
+}
+.cardWrapper{
     display: flex;
     gap: 10px;
 }
@@ -37,17 +40,44 @@
 .heightWrapper{
     width: 100%;
 }
-.additionalWrapper{
+.typeWrapper{
     display: flex;
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
     margin-top: 10px;
 }
+.additionalWrapper{
+    display: flex;
+    align-items: center;
+    color: var(--components-background);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+    cursor: pointer;
+    margin-top: 5px;
+    user-select: none;
+}
+.additionalInfo{
+    padding-top: 12px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+}
+.additionalWrapperActive span{
+    color: #808080;
+}
+.additionalWrapperActive svg{
+    rotate: 180deg;
+}
+.additionalWrapperActive svg path{
+    stroke: #808080;
+}
 .priceWrapper{
     display: flex;
     justify-content: end;
     align-self: end;
+    margin-top: 12px;
 }
 .currency{
     font-weight: 600;
