@@ -553,7 +553,7 @@ def update_offer_request(json_data):
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offer/requests/delete', methods=['POST'])
-@validate_json(required_keys=['telegram_user_id', 'offer_type', 'id'])
+@validate_json(required_keys=['telegram_user_id', 'id'])
 def delete_offer_request(json_data):
     try:
         offer = db.session.query(OfferRequests).filter_by(
