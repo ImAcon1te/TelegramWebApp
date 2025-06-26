@@ -329,8 +329,8 @@ def update_offer(json_data):
         user_id = json_data.get('telegram_user_id')
 
         model_map = {
-            'Culture': Culture,
-            'Vehicle': Vehicle
+            'culture': Culture,
+            'vehicle': Vehicle
         }
 
         model = model_map.get(offer_type)
@@ -352,7 +352,7 @@ def update_offer(json_data):
             offer.additional_info = json_data['additional_info']
 
         # Culture-specific
-        if offer_type == 'Culture':
+        if offer_type == 'culture':
             if 'commodity_type_id' in json_data:
                 type_id = json_data['commodity_type_id']
                 validate_or_raise(
@@ -365,7 +365,7 @@ def update_offer(json_data):
                 offer.tonnage = parse_positive_numeric(json_data['tonnage'], 'tonnage')
 
         # Vehicle-specific
-        elif offer_type == 'Vehicle':
+        elif offer_type == 'vehicle':
             if 'vehicle_type_id' in json_data:
                 type_id = json_data['vehicle_type_id']
                 validate_or_raise(
