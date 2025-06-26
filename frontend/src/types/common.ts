@@ -6,8 +6,8 @@ export interface SelectOption {
 }
 
 export enum RolesMap {
-  CULTURE = 'Culture',
-  VEHICLE = 'Vehicle'
+  CULTURE = 'culture',
+  VEHICLE = 'vehicle'
 }
 export type StatusType = "pending" | "active" | string;
 

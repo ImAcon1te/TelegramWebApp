@@ -8,7 +8,7 @@ export const useOffersSent = (offerType: RolesMap) => {
     queryKey: ['offersSent', offerType],
     queryFn: () =>
       fetch(
-        `/offer/requests/sent?telegram_user_id=${getTgId()}`,
+        `/offer/requests/sent?telegram_user_id=${getTgId()}&offer_type=${offerType}`,
         getInitForGet()
       )
         .then(res => {

@@ -17,9 +17,30 @@
     color: var(--primary-color);
     cursor: pointer;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+.tab svg{
+    height: 16px;
+    width: 16px;
+}
+.tab svg path{
+    stroke: var(--primary-color);
 }
 .tabActive{
     border-radius: 10px 10px 0 0;
     background: rgba(55, 209, 156, 0.11);
     border-bottom: 1px solid #BDF5EF;
+}
+
+.tabs {
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
 }

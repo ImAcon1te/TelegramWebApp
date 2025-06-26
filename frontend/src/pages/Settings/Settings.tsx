@@ -15,6 +15,8 @@ const SettingsForm: React.FC = ({
   const navigate = useNavigate();
   const handleSubmit = async (formData: UserFormData) => {
     await postUpdateUser(formData)
+    // const queryClient = useQueryClient();
+
   };
 
   const handleBack = () => {
@@ -30,7 +32,7 @@ const SettingsForm: React.FC = ({
         firstName: userData.first_name,
         lastName: userData.last_name,
         phone: userData.phone,
-        region_id: userData.region_id,
+        region_id: userData.region.id,
       }
     }
   }, [userData])

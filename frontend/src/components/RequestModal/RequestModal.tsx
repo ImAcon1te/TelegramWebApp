@@ -9,6 +9,7 @@ import {Input} from "../Input/Input.tsx";
 import {TextArea} from "../TextArea/TextArea.tsx";
 import styles from './RequestModal.module.css'
 import {postRequestOffer, postRequestOfferUpdate} from "../../service/service.ts";
+import {useQueryClient} from "@tanstack/react-query";
 
 interface Props{
   isOpen: boolean
@@ -17,6 +18,7 @@ interface Props{
   requestOffer?: RequestOffer
 }
 export const RequestModal:FC<Props> = ({requestOffer, closeModal, offer, isOpen}) => {
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState<RequestOfferData>({
     offer_type: RolesMap.CULTURE,
     overwrite_amount: 1,
@@ -41,7 +43,12 @@ export const RequestModal:FC<Props> = ({requestOffer, closeModal, offer, isOpen}
         offer_type: formData.offer_type,
         overwrite_amount: formData.overwrite_amount
       }
-      await postRequestOffer(data)
+      const resp = await postRequestOffer(data)
+      if(resp){
+        await queryClient.invalidateQueries({
+          queryKey: ['offersSent', getOfferType(offer)],
+        });
+      }
     }
     if(requestOffer){
       const data:RequestOfferDataBase = {
@@ -50,9 +57,13 @@ export const RequestModal:FC<Props> = ({requestOffer, closeModal, offer, isOpen}
         offer_type: formData.offer_type,
         overwrite_amount: formData.overwrite_amount
       }
-      await postRequestOfferUpdate(data)
+      const resp = await postRequestOfferUpdate(data)
+      if(resp){
+        await queryClient.invalidateQueries({
+          queryKey: ['offersSent', getOfferType(offer)],
+        });
+      }
     }
-    // handleSubmit(data)
 
     closeModal()
   }

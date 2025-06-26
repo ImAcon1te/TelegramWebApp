@@ -1,5 +1,5 @@
 import styles from "./Card.module.css"
-import {Offer} from "../../types/responses.ts";
+import {Offer, RequestOffer} from "../../types/responses.ts";
 import {FC, useState} from "react";
 import {ArrowIcon} from "../../assets/icons/right-arrow-icon.tsx";
 import {EditIcon} from "../../assets/icons/edit-icon.tsx";
@@ -11,7 +11,7 @@ interface CardProps {
   editHandle?: () => void
   deleteHandle?: () => void
   requestHandle?: () => void
-  isInnerCard?: boolean
+  requestOffer?: RequestOffer
 
 }
 export const Card:FC<CardProps> = ({
@@ -19,11 +19,11 @@ export const Card:FC<CardProps> = ({
   editHandle,
   deleteHandle,
   requestHandle,
-  isInnerCard
+  requestOffer
 }) => {
   const [descActive, setDescActive] = useState<boolean>(false);
   return (
-    <div className={!isInnerCard ? styles.card : ''}>
+    <div className={!requestOffer ? styles.card : ''}>
       <div className={styles.cardWrapper}>
         <div className={styles.photoRatingWrapper}>
           <div className={styles.imageWrapper}>
@@ -72,17 +72,22 @@ export const Card:FC<CardProps> = ({
           {offer.additional_info}
           </div>
       }
-      <div className={styles.priceWrapper}>
-        <span className={styles.currency}>грн</span>
-        <span className={styles.price}>{offer.price}/</span>
-        <span className={styles.tonnage}>
-              {
-                offer.commodity_type
-                  ? `${offer.tonnage}т`
-                  : `${offer.days}д`
-              }
-            </span>
-      </div>
+      {!!requestOffer
+        ? <div className={styles.priceWrapper}>
+          <span className={styles.currency}>грн</span>
+          <span className={styles.price}>{offer.price * requestOffer.overwrite_amount}</span>
+        </div>
+        : <div className={styles.priceWrapper}>
+          <span className={styles.currency}>грн</span>
+          <span className={styles.price}>{offer.price}/</span>
+          <span className={styles.tonnage}>
+            {
+              offer.commodity_type
+                ? `1т`
+                : `1д`
+            }
+          </span>
+        </div>}
     </div>
   )
 }

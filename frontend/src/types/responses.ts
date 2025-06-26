@@ -1,12 +1,6 @@
 import {RolesMap, StatusType} from "./common.ts";
 
-export interface UserData{
-  "user_id": number,
-  "first_name": string,
-  "last_name": string,
-  "phone": string,
-  "region_id": string,
-}
+
 export interface Region {
   district: string,
   id:number
@@ -17,6 +11,13 @@ export type CommodityType = {
   code: string;
   name: string;
 };
+export interface UserData{
+  "user_id": number,
+  "first_name": string,
+  "last_name": string,
+  "phone": string,
+  "region": Region,
+}
 export interface OfferTypesData {
   "commodity_types": CommodityType[],
   "vehicle_types": CommodityType[]

@@ -25,7 +25,8 @@ export const getTg = ()  => {
 export const getTgId = () => {
   const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
   if(isLocalhost){
-    return  551234
+    // return 41232134
+    return 551234
   }
   return getTg()?.id
 }
@@ -140,6 +141,20 @@ export const postRequestOfferUpdate = async (formData: RequestOfferDataBase) => 
   const body = getBody(formData)
   return await fetch('/offer/requests/update', {
     method: 'PATCH',
+    headers: {
+      'Content-Type': ' application/json'
+    },
+    body: body,
+    credentials: 'same-origin'
+  }).then(resp=>resp.json());;
+}
+
+export const postRequestOfferReceivedDelete = async (formData: {
+  "request_offer_id": number
+}) => {
+  const body = getBody(formData)
+  return await fetch('/offer/requests/decline', {
+    method: 'POST',
     headers: {
       'Content-Type': ' application/json'
     },

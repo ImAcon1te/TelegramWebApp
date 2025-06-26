@@ -23,21 +23,17 @@ export const RequestCard:FC<RequestCardProps> = ({
     <div className={styles.card}>
       <div className={styles.requestWrapper}>
         <div className="cols-gap-10">
-
           <div className={styles.requestHeader}>
             <div className={styles.requestTitle}>{isSent ? 'Відповідь від клієнта' : 'Ваша заявка'}</div>
-            {editHandle && deleteHandle &&<div className={styles.actions}>
-                <div className={`${styles.action} ${styles.actionSuccess}`} onClick={editHandle}>
-                    <EditIcon/>
-                </div>
-                <div className={`${styles.action} ${styles.actionDanger}`} onClick={deleteHandle}>
-                    <CrossIcon/>
-                </div>
+            {(editHandle || deleteHandle) &&<div className={styles.actions}>
+                {editHandle && <div className={`${styles.action} ${styles.actionSuccess}`} onClick={editHandle}>
+                  <EditIcon/>
+                </div>}
+                {deleteHandle && <div className={`${styles.action} ${styles.actionDanger}`} onClick={deleteHandle}>
+                  <CrossIcon/>
+                </div>}
             </div>}
           </div>
-
-
-
           {offer.overwrite_amount && <div>
               <div className={styles.requestInput}>{offer.overwrite_amount} {getOfferType(offer) === RolesMap.CULTURE ? 'т.' : 'д.'}</div>
               <div className="bottom-text">Кількість {getOfferType(offer) === RolesMap.CULTURE ? 'тонн' : 'днів'},
@@ -53,7 +49,7 @@ export const RequestCard:FC<RequestCardProps> = ({
       <Card
         offer={offer.offer}
         key={offer.id}
-        isInnerCard
+        requestOffer={offer}
       />
     </div>
   )
