@@ -485,7 +485,7 @@ def get_sent_requests():
     user_id = request.args.get('telegram_user_id')
     offer_type_enum_map = {
         'culture': OfferTypeEnum.cultureOffer,
-         'vehicle': OfferTypeEnum.vehicleOffer
+        'vehicle': OfferTypeEnum.vehicleOffer
     }.get(request.args.get('offer_type'))
     try:
         data = db.session.query(OfferRequests).filter_by(user_id=user_id, status=StatusEnum.pending, offer_type=offer_type_enum_map).all()
