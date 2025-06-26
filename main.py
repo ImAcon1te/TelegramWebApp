@@ -568,21 +568,33 @@ def get_received_requests():
     try:
         culture_ids = db.session.query(Culture.id).filter_by(user_id=user_id).subquery()
         vehicle_ids = db.session.query(Vehicle.id).filter_by(user_id=user_id).subquery()
-
-        requests = db.session.query(OfferRequests).filter(
-            db.or_(
-                db.and_(
-                    OfferRequests.offer_type == OfferTypeEnum.cultureOffer,
-                    OfferRequests.status == StatusEnum.pending,
-                    OfferRequests.offer_id.in_(culture_ids)
-                ),
-                db.and_(
-                    OfferRequests.offer_type == OfferTypeEnum.vehicleOffer,
-                    OfferRequests.status == StatusEnum.pending,
-                    OfferRequests.offer_id.in_(vehicle_ids)
+        offer_type = {
+            'culture': OfferTypeEnum.cultureOffer,
+            'vehicle': OfferTypeEnum.vehicleOffer
+        }.get(request.args.get('offer_type'))
+        if not offer_type:
+            return jsonify({"error": "incorrect offer_type"}), 404
+        if request.args.get('offer_type') == 'culture':
+            requests = db.session.query(OfferRequests).filter(
+                db.or_(
+                    db.and_(
+                        OfferRequests.offer_type == offer_type,
+                        OfferRequests.status == StatusEnum.pending,
+                        OfferRequests.offer_id.in_(culture_ids)
+                    )
                 )
-            )
-        ).all()
+            ).all()
+        else:
+            requests = db.session.query(OfferRequests).filter(
+                db.or_(
+                    db.and_(
+                        OfferRequests.offer_type == offer_type,
+                        OfferRequests.status == StatusEnum.pending,
+                        OfferRequests.offer_id.in_(vehicle_ids)
+                    )
+                )
+            ).all()
+
 
         return jsonify([req.to_dict() for req in requests]), 200
 
