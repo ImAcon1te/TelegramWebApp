@@ -60,13 +60,11 @@ def generate_test_data():
         from urllib.parse import parse_qs
         from sqlalchemy import delete
 
-        # Параметры из query
         truncate = request.args.get('truncate', 'false').lower() == 'true'
         user_count = int(request.args.get('users', 10))
         offer_count = int(request.args.get('offers', 10))
         request_count = int(request.args.get('requests', 20))
 
-        # Очистка БД (опционально)
         if truncate:
             db.session.execute(delete(OfferRequests))
             db.session.execute(delete(Culture))
@@ -75,7 +73,6 @@ def generate_test_data():
             db.session.execute(delete(Region))
             db.session.commit()
 
-        # 1. Регионы
         regions = []
         for _ in range(5):
             region = Region(oblast=fake.region(), district=fake.city())
@@ -83,7 +80,6 @@ def generate_test_data():
             regions.append(region)
         db.session.flush()
 
-        # 2. Пользователи
         users = []
         for _ in range(user_count):
             user = User(
@@ -97,13 +93,11 @@ def generate_test_data():
             users.append(user)
         db.session.flush()
 
-        # 3. Типы
         commodity_types = db.session.query(CommodityType).all()
         vehicle_types = db.session.query(VehicleType).all()
         if not commodity_types or not vehicle_types:
             return jsonify({"error": "Seed commodity_types and vehicle_types first"}), 400
 
-        # 4. Предложения
         culture_offers = []
         vehicle_offers = []
         for _ in range(offer_count):
@@ -131,7 +125,6 @@ def generate_test_data():
                 vehicle_offers.append(offer)
         db.session.flush()
 
-        # 5. Заявки
         for _ in range(request_count):
             if culture_offers and choice([True, False]):
                 offer = choice(culture_offers)
