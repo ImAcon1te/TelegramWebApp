@@ -64,10 +64,10 @@ class OfferRequests(db.Model):
 
     def to_dict(self):
         offer_data = None
-        if self.offer_type == OfferTypeEnum.CultureOffer:
+        if self.offer_type == OfferTypeEnum.cultureOffer:
             offer = db.session.query(Culture).filter_by(id=self.offer_id).first()
             offer_data = offer.to_dict() if offer else None
-        elif self.offer_type == OfferTypeEnum.VehicleOffer:
+        elif self.offer_type == OfferTypeEnum.vehicleOffer:
             offer = db.session.query(Vehicle).filter_by(id=self.offer_id).first()
             offer_data = offer.to_dict() if offer else None
 
