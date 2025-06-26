@@ -1,11 +1,13 @@
 :root {
     --bg-color: #1a202e;
     --primary-color: white;
-    --secondary-color: #808080;
+    --third-color: #808080;
     --input-placeholder: #bdf5ef;
     --border-color: #bdf5ef;
-    --components-background: #BDF5EF;
+    --secondary-color: #BDF5EF;
     --select-option-checked: #1d333a;
+    --disabled-border: #64748B;
+    --disabled-input-color: #94A3B8;
 }
 body {
     font-family: 'Inter', sans-serif;
@@ -135,4 +137,17 @@ body {
     margin-bottom: 10px;
     font-size: 14px;
     color: var(--primary-color);
+}
+.bottom-text{
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+    color: var(--third-color);
+    margin-top: 3px;
+}
+.cols-gap-10{
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
 }

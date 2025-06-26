@@ -5,6 +5,7 @@ import {postUpdateOffer} from "../../service/service.ts";
 import {useMyOffers} from "../../service/useMyOffers.ts";
 import {useQueryClient} from "@tanstack/react-query";
 import {RolesMap} from "../../types/common.ts";
+import {Tabs, TabsVariant} from "../../components/Tabs/Tabs.tsx";
 
 export const OfferEditPage = () => {
   const navigate = useNavigate()
@@ -32,7 +33,6 @@ export const OfferEditPage = () => {
   const queryClient = useQueryClient();
 
   const handleSubmit = async (formData: OfferData) => {
-    console.log('test', 'myOffers', formData.offer_type)
     const resp = await postUpdateOffer(formData)
     if(resp.message === "Offer updated successfully"){
       await queryClient.invalidateQueries({
@@ -40,15 +40,18 @@ export const OfferEditPage = () => {
       });
       navigate('/my-offers')
     }
-    console.log('resp', resp)
   };
 
   return (
-    <OfferForm
-      title="На цій сторінці ви можете редагувати власне оголошення, яке буде зображено усім користувачам системи"
-      handleSubmit={handleSubmit}
-      initData={initData}
-      buttonText="Зберегти зміни"
-    />
+    <div>
+      <Tabs variant={TabsVariant.MAIN} />
+      <OfferForm
+        title="На цій сторінці ви можете редагувати власне оголошення, яке буде зображено усім користувачам системи"
+        handleSubmit={handleSubmit}
+        initData={initData}
+        buttonText="Зберегти зміни"
+      />
+    </div>
+
   )
 }

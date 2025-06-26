@@ -46,7 +46,6 @@ export const UserForm:React.FC<UserFormProps> = ({
       [name]: value
     }))
   }
-  console.log('form data', formData)
 
   return (
     <form
@@ -81,7 +80,7 @@ export const UserForm:React.FC<UserFormProps> = ({
         onChange={(value) => onChange('phone', value)}
       />
       <Select
-        label="Область"
+        label="Регіон"
         value={formData.region_id}
         placeholder="Введіть..."
         required

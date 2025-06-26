@@ -53,7 +53,10 @@ class OfferRequests(db.Model):
     user_id = db.Column(db.BigInteger, db.ForeignKey('users.user_id'), nullable=False)
     offer_id = db.Column(db.Integer, nullable=False)
     offer_type = db.Column(db.Enum(OfferTypeEnum), nullable=False)
-    status = db.Column(db.Enum(StatusEnum), nullable=False)
+    status = db.Column(
+                 db.Enum(StatusEnum, name="statusenum", values_callable=lambda x: [e.value for e in x]),
+                 nullable=False
+             )
     overwrite_sum = db.Column(db.Numeric(10, 2), nullable=True)
     overwrite_amount = db.Column(db.Numeric(10, 2), nullable=True)
     comment = db.Column(db.Text, nullable=True)

@@ -7,7 +7,6 @@ interface ModalProps {
   closeModal: () => void
 }
 export const Modal:FC<ModalProps> = ({isOpen, title, children, closeModal}) => {
-  console.log(isOpen)
   if(!isOpen){
     return null
   }

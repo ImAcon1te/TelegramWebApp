@@ -10,7 +10,7 @@
     background-color: #1a202e;
     border: 1px solid #bdf5ef;
     transition: background-color 0.3s;
-    color: var(--components-background);
+    color: var(--secondary-color);
     padding: 14px 16px;
 
 }
@@ -24,7 +24,7 @@
 
 }
 .primary {
-    background: var(--components-background);
+    background: var(--secondary-color);
     color: var(--bg-color);
     font-weight: 600;
     font-size: 16px;

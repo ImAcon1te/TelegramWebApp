@@ -42,7 +42,6 @@ export const OfferForm:FC<OfferFormProps> = ({handleSubmit, title, initData, but
     }))
   }
   useEffect(() => {
-    console.log('initData', initData)
     if(initData){
       setFormData(prev=>({
         ...prev,
@@ -94,7 +93,7 @@ export const OfferForm:FC<OfferFormProps> = ({handleSubmit, title, initData, but
           options={OfferOptions}
         />
         <Select
-          label={formData.offer_type===RolesMap.CULTURE ? 'Тип культури' : 'Тип техніки'}
+          label={formData.offer_type===RolesMap.CULTURE ? 'Культура' : 'Техніка'}
           value={formData.type_id}
           required
           onChange={(value) => onChange('type_id', value)}
@@ -104,7 +103,7 @@ export const OfferForm:FC<OfferFormProps> = ({handleSubmit, title, initData, but
           })) || []}
         />
         <Input
-          label="Загальна ціна"
+          label={`Ціна за ${formData.offer_type===RolesMap.CULTURE ? 'тону' : 'день'}`}
           required
           step={0.01}
           value={formData.price}
@@ -113,16 +112,16 @@ export const OfferForm:FC<OfferFormProps> = ({handleSubmit, title, initData, but
           onChange={(value) => onChange('price', +value)}
         />
         {formData.offer_type === RolesMap.CULTURE && <Input
-            label="Кількість тонн"
+            label="Тонаж"
             required
-            step={0.01}
+            step={1}
             value={formData.tonnage}
             type="number"
-            min={0.01}
+            min={1}
             onChange={(value) => onChange('tonnage', +value)}
         />}
         {formData.offer_type === RolesMap.VEHICLE && <Input
-            label="Кількість днів (термін оренди)"
+            label="Термін оренди(кількість днів)"
             required
             step={1}
             value={formData.days}
@@ -131,7 +130,7 @@ export const OfferForm:FC<OfferFormProps> = ({handleSubmit, title, initData, but
             onChange={(value) => onChange('days', +value)}
         />}
         <Select
-          label="Область"
+          label="Регіон"
           value={formData.region_id}
           // required
           onChange={(value) => onChange('region_id', value)}

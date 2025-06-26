@@ -1,5 +1,5 @@
-import {FC, useState} from "react";
-import {Offer} from "../../types/responses.ts";
+import {FC, useEffect, useState} from "react";
+import {Offer, RequestOffer} from "../../types/responses.ts";
 import {Modal} from "../Modal/Modal.tsx";
 import {Button, ButtonVariant} from "../Button/Button.tsx";
 import {RequestOfferData, RequestOfferDataBase} from "../../types/forms.ts";
@@ -8,18 +8,20 @@ import {getOfferType} from "../../helpers/helpers.tsx";
 import {Input} from "../Input/Input.tsx";
 import {TextArea} from "../TextArea/TextArea.tsx";
 import styles from './RequestModal.module.css'
-import {postRequestOffer} from "../../service/service.ts";
+import {postRequestOffer, postRequestOfferUpdate} from "../../service/service.ts";
+import {useQueryClient} from "@tanstack/react-query";
 
 interface Props{
-  requestOffer: Offer
+  isOpen: boolean
+  offer?: Offer
   closeModal: () => void
+  requestOffer?: RequestOffer
 }
-export const RequestModal:FC<Props> = ({requestOffer, closeModal}) => {
+export const RequestModal:FC<Props> = ({requestOffer, closeModal, offer, isOpen}) => {
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState<RequestOfferData>({
-    offer_id: requestOffer.id,
-    offer_type: getOfferType(requestOffer),
-    overwrite_sum: requestOffer.price,
-    overwrite_amount: getOfferType(requestOffer) === RolesMap.CULTURE ? requestOffer.tonnage : 0,
+    offer_type: RolesMap.CULTURE,
+    overwrite_amount: 1,
     comment: '',
   });
 
@@ -34,47 +36,81 @@ export const RequestModal:FC<Props> = ({requestOffer, closeModal}) => {
   }
 
   const handleSubmit = async () => {
-    const data:RequestOfferDataBase = {
-      offer_id: formData.offer_id,
-      comment: formData.comment,
-      offer_type: formData.offer_type,
+    if(offer){
+      const data:RequestOfferDataBase = {
+        offer_id: offer.id,
+        comment: formData.comment,
+        offer_type: formData.offer_type,
+        overwrite_amount: formData.overwrite_amount
+      }
+      const resp = await postRequestOffer(data)
+      if(resp){
+        await queryClient.invalidateQueries({
+          queryKey: ['offersSent', getOfferType(offer)],
+        });
+      }
     }
-    if(formData.overwrite_sum !== requestOffer.price){
-      data.overwrite_sum = formData.overwrite_sum
+    if(requestOffer){
+      const data:RequestOfferDataBase = {
+        id: requestOffer.id,
+        comment: formData.comment,
+        offer_type: formData.offer_type,
+        overwrite_amount: formData.overwrite_amount
+      }
+      const resp = await postRequestOfferUpdate(data)
+      if(resp){
+        await queryClient.invalidateQueries({
+          queryKey: ['offersSent', getOfferType(offer)],
+        });
+      }
     }
-    if(formData.offer_type === RolesMap.CULTURE && formData.overwrite_amount !== requestOffer.tonnage){
-      data.overwrite_amount = formData.overwrite_amount
-    }
-    const resp = await postRequestOffer(data)
-    console.log('resp', resp)
+
     closeModal()
   }
 
-
+  useEffect(() => {
+    if(requestOffer){
+      setFormData(prev => ({
+        ...prev,
+        offer_type: getOfferType(requestOffer),
+        overwrite_amount: requestOffer.overwrite_amount,
+        comment: requestOffer.comment,
+      }))
+    }
+  }, [requestOffer])
+  useEffect(() => {
+    if(offer){
+      setFormData(prev => ({
+        ...prev,
+        offer_type: getOfferType(requestOffer),
+        overwrite_amount: getOfferType(requestOffer) === RolesMap.CULTURE ? offer.tonnage : offer.days,
+      }))
+    }
+  }, [offer])
   return (
-    <Modal isOpen={!!requestOffer} title="Заявка на оренду" closeModal={closeModal}>
+    <Modal isOpen={isOpen} title="Заявка на оренду" closeModal={closeModal}>
       <div className="modal-text">Тут ви можете запропонувати свої умови для угоди</div>
       <div className={styles.form}></div>
       <form onSubmit={(e) => {
         e.preventDefault()
         handleSubmit()
       }} className="form-wrapper">
-        <Input
-          label="Загальна ціна"
-          required
-          step={0.01}
-          value={formData.overwrite_sum}
-          type="number"
-          min={0}
-          onChange={(value) => onChange('overwrite_sum', +value)}
-        />
         {formData.offer_type === RolesMap.CULTURE && <Input
-            label="Кількість тонн"
-            required
-            step={0.01}
+            label="Тоннаж"
+            step={1}
             value={formData.overwrite_amount}
             type="number"
-            min={0.01}
+            min={1}
+            max={requestOffer?.overwrite_amount || offer?.tonnage}
+            onChange={(value) => onChange('overwrite_amount', +value)}
+        />}
+        {formData.offer_type === RolesMap.VEHICLE && <Input
+            label="Термін оренди(кількість днів)"
+            step={1}
+            value={formData.overwrite_amount}
+            type="number"
+            min={1}
+            max={requestOffer?.overwrite_amount || offer?.days}
             onChange={(value) => onChange('overwrite_amount', +value)}
         />}
         <TextArea

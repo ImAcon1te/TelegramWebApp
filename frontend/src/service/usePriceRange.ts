@@ -1,21 +1,24 @@
 import {useQuery} from "@tanstack/react-query";
 import {getInitForGet} from "./service.ts";
-import {OfferTypesData} from "../types/responses.ts";
+import {PriceRangeData} from "../types/responses.ts";
+import {RolesMap} from "../types/common.ts";
 
-export const useOfferTypes = () => {
-  return useQuery<OfferTypesData>({
-    queryKey: ['offerTypes'],
+export const usePriceRange = ({
+  offerType
+}:{
+  offerType: RolesMap
+}) => {
+  return useQuery<PriceRangeData>({
+    queryKey: ['priceRange', offerType],
     queryFn: () =>
       fetch(
-        `/offer/types`,
+        `/offers/price-range?offer_type=${offerType}`,
         getInitForGet()
       )
         .then(res => {
           if (!res.ok) throw new Error('Ошибка сети');
           return res.json();
         }),
-    staleTime: 60_000,
     refetchOnWindowFocus: false,
-    retry: false,
   });
 }

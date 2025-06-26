@@ -35,7 +35,7 @@
 }
 .roleActive {
     color: var(--bg-color);
-    background: var(--components-background);
+    background: var(--secondary-color);
 }
 .roleActive svg path{
     stroke: var(--bg-color);

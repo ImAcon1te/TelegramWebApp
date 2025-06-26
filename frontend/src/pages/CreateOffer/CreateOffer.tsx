@@ -4,6 +4,7 @@ import {useQueryClient} from "@tanstack/react-query";
 import {OfferData} from "../../types/forms.ts";
 import {OfferForm} from "../../components/OfferForm/OfferForm.tsx";
 import {useNavigate} from "react-router-dom";
+import {Tabs, TabsVariant} from "../../components/Tabs/Tabs.tsx";
 
 export const CreateOffer = () => {
   const navigate = useNavigate();
@@ -17,15 +18,18 @@ export const CreateOffer = () => {
       navigate('/my-offers')
 
     }
-    console.log('resp', resp)
   };
 
   return (
-    <OfferForm
-      title="На цій сторінці ви можете створити власне оголошення, яке буде зображено усім користувачам системи"
-      handleSubmit={handleSubmit}
-      buttonText="Створити оголошення"
-    />
+    <div>
+      <Tabs variant={TabsVariant.MAIN} />
+      <OfferForm
+        title="На цій сторінці ви можете створити власне оголошення, яке буде зображено усім користувачам системи"
+        handleSubmit={handleSubmit}
+        buttonText="Створити оголошення"
+      />
+    </div>
+
 
   )
 }

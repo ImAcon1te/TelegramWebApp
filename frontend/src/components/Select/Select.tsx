@@ -28,10 +28,12 @@ export const Select: React.FC<SelectProps> = ({
       </div>
       <select
         className="form-select"
-        value={value}
+        value={value ?? ''}
         onChange={(e) => onChange(options.find(item => item.value == e.target.value)?.value || options[0].value)}
         required={required}
       >
+        <option value="" disabled hidden></option>
+
         {options.map(option => (
           <option key={option.value} value={option.value}>
             {option.label}

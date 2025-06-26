@@ -18,7 +18,6 @@ export const MyOffers = () => {
   const {activeRole} = useAppStore();
   const {data: myOffersList, isLoading} = useMyOffers(activeRole);
   const [deleteOffer, setDeleteOffer] = useState<Offer | null>(null)
-  console.log('offersList', myOffersList)
   if(isLoading){
     return null
   }else if(!myOffersList || myOffersList.length < 1){

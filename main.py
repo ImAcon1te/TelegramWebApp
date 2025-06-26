@@ -320,6 +320,73 @@ def create_offer_type(json_data):
         db.session.rollback()
         return jsonify({"error": "Internal Server Error"}), 500
 
+@app.route('/offer/update', methods=['PATCH'])
+@validate_json(required_keys=['offer_type', 'id', 'telegram_user_id'])
+def update_offer(json_data):
+    try:
+        offer_type = json_data.get('offer_type')
+        offer_id = json_data.get('id')
+        user_id = json_data.get('telegram_user_id')
+
+        model_map = {
+            'culture': Culture,
+            'vehicle': Vehicle
+        }
+
+        model = model_map.get(offer_type)
+        if not model:
+            return jsonify({"error": "Invalid offer_type"}), 400
+
+        offer = db.session.query(model).filter_by(id=offer_id, user_id=user_id).first()
+        if not offer:
+            return jsonify({"error": "Offer not found"}), 404
+
+        # Общие поля
+        if 'region_id' in json_data:
+            offer.region_id = parse_and_validate_region_id(json_data['region_id'])
+
+        if 'price' in json_data:
+            offer.price = parse_positive_numeric(json_data['price'], 'price')
+
+        if 'additional_info' in json_data:
+            offer.additional_info = json_data['additional_info']
+
+        # Culture-specific
+        if offer_type == 'culture':
+            if 'commodity_type_id' in json_data:
+                type_id = json_data['commodity_type_id']
+                validate_or_raise(
+                    db.session.query(CommodityType.id).filter_by(id=type_id).first() is not None,
+                    "Invalid commodity_type_id"
+                )
+                offer.commodity_type_id = type_id
+
+            if 'tonnage' in json_data:
+                offer.tonnage = parse_positive_numeric(json_data['tonnage'], 'tonnage')
+
+        # Vehicle-specific
+        elif offer_type == 'vehicle':
+            if 'vehicle_type_id' in json_data:
+                type_id = json_data['vehicle_type_id']
+                validate_or_raise(
+                    db.session.query(VehicleType.id).filter_by(id=type_id).first() is not None,
+                    "Invalid vehicle_type_id"
+                )
+                offer.vehicle_type_id = type_id
+
+            if 'days' in json_data:
+                offer.days = parse_positive_int(json_data['days'], 'days')
+
+        db.session.commit()
+        return jsonify({"message": "Offer updated successfully"}), 200
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Internal Server Error"}), 500
+
+
 @app.route('/offer/delete', methods=['POST'])
 @validate_json(required_keys=['telegram_user_id', 'offer_type', 'id'])
 def delete_offer(json_data):
@@ -491,6 +558,8 @@ def get_sent_requests():
         data = db.session.query(OfferRequests).filter_by(user_id=user_id, status=StatusEnum.pending, offer_type=offer_type_enum_map).all()
         return jsonify([req.to_dict() for req in data]), 200
     except Exception as e:
+        print(e)
+        raise e
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offer/requests/received', methods=['GET'])

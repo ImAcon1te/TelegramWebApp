@@ -20,10 +20,20 @@ export interface UserFormData {
 
 export interface RequestOfferData{
   "offer_type": RolesMap,
-  "offer_id": number,
-  "overwrite_sum": number,
+  "offer_id"?: number,
+  "id"?: number,
+  "overwrite_sum"?: number,
   "overwrite_amount": number,
   "comment": string
 }
 export type RequestOfferDataBase = Omit<RequestOfferData, 'overwrite_sum' | 'overwrite_amount'> &
   Partial<Pick<RequestOfferData, 'overwrite_sum' | 'overwrite_amount'>>
+
+export interface FilterOfferData {
+  offer_type: RolesMap
+  price_start: number
+  price_end: number
+  name: string
+  region?: number
+  type_id?: number
+}
