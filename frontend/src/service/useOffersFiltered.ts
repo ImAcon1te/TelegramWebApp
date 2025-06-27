@@ -6,7 +6,7 @@ import {objectToQueryStringWithURL} from "../helpers/helpers.tsx";
 
 export const useOffersFiltered = (filters: FilterOfferData | null) => {
   return useQuery<Offer[]>({
-    queryKey: ['offersFilteres'],
+    queryKey: ['offersFilteres', filters],
     queryFn: () =>
       fetch(
         objectToQueryStringWithURL(`/offers/search`, {

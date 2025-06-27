@@ -34,7 +34,7 @@ export const ReceivedOffers = () => {
     const resp = await postRequestOfferReceivedDelete({
       request_offer_id: deleteOffer?.id,
     })
-    if(resp.message === "offer deleted"){
+    if(resp.message === "offer declined"){
       await queryClient.invalidateQueries({
         queryKey: ['offersReceived', getOfferType(deleteOffer)],
       });

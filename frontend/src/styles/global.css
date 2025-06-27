@@ -26,7 +26,10 @@ body {
     overflow: auto;
     height: calc(100vh - 64px - 90px);
 }
+.main-no-roles{
+    height: calc(100vh - 64px);
 
+}
 .form-group {
     display: flex;
     flex-direction: column;

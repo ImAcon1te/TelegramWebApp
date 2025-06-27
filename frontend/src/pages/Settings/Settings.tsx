@@ -7,16 +7,19 @@ import {UserForm} from "../../components/UserForm/UserForm.tsx";
 import {useUser} from "../../service/useUser.ts";
 import {useMemo} from "react";
 import {ArrowBackIcon} from "../../assets/icons/arrow-back-icon.tsx";
+import {useQueryClient} from "@tanstack/react-query";
 
 const SettingsForm: React.FC = ({
 }) => {
+  const queryClient = useQueryClient();
   const {data: userData} = useUser()
 
   const navigate = useNavigate();
   const handleSubmit = async (formData: UserFormData) => {
     await postUpdateUser(formData)
-    // const queryClient = useQueryClient();
-
+    await queryClient.invalidateQueries({
+      queryKey: ['user'],
+    });
   };
 
   const handleBack = () => {

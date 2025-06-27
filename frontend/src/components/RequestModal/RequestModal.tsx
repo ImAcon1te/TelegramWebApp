@@ -18,12 +18,15 @@ interface Props{
   requestOffer?: RequestOffer
 }
 export const RequestModal:FC<Props> = ({requestOffer, closeModal, offer, isOpen}) => {
+
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<RequestOfferData>({
     offer_type: RolesMap.CULTURE,
     overwrite_amount: 1,
     comment: '',
   });
+  console.log('test', offer)
+  console.log('formData', formData)
 
   const onChange = (
     name: string,
@@ -96,7 +99,7 @@ export const RequestModal:FC<Props> = ({requestOffer, closeModal, offer, isOpen}
         handleSubmit()
       }} className="form-wrapper">
         {formData.offer_type === RolesMap.CULTURE && <Input
-            label="Тоннаж"
+            label={`Тоннаж`}
             step={1}
             value={formData.overwrite_amount}
             type="number"
@@ -105,7 +108,7 @@ export const RequestModal:FC<Props> = ({requestOffer, closeModal, offer, isOpen}
             onChange={(value) => onChange('overwrite_amount', +value)}
         />}
         {formData.offer_type === RolesMap.VEHICLE && <Input
-            label="Термін оренди(кількість днів)"
+            label={`Термін оренди(кількість днів)`}
             step={1}
             value={formData.overwrite_amount}
             type="number"

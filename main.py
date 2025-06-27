@@ -664,8 +664,8 @@ def decline_offer_request(json_data):
             return jsonify({"error": "Offer request not found"}), 404
 
         model_class = {
-            'culture': Culture,
-            'vehicle': Vehicle
+          OfferTypeEnum.cultureOffer: Culture,
+          OfferTypeEnum.vehicleOffer: Vehicle
         }.get(offer_request.offer_type)
 
         offer = db.session.query(model_class).filter_by(id=offer_request.offer_id).first()
@@ -680,6 +680,8 @@ def decline_offer_request(json_data):
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         db.session.rollback()
+        print(e)
+        raise e
         return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route('/offers/search', methods=['GET'])
